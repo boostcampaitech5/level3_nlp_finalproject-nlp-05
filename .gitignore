@@ -1,0 +1,11 @@
+*
+!.bashrc
+!.github/
+!.github/*
+!.github/ISSUE_TEMPLATE/
+!.github/ISSUE_TEMPLATE/*
+!.gitignore
+!.gitmessage
+!README.md
+!*.pdf
+*.json
