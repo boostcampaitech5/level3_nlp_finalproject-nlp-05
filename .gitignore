@@ -19,6 +19,7 @@
 .wget-hsts
 npm-debug.log
 sdk-cmdline-tools
+.git-credentials
 
 # react-native
 node_modules/
