@@ -3,12 +3,12 @@ FROM ubuntu:20.04
 FROM python:3.9-slim
 
 # Set working directory
-WORKDIR /app
+WORKDIR /code
 
 # Update packages and install dependencies
 RUN apt-get update -y
 RUN pip install --upgrade pip
-COPY requirement.txt /app/requirement.txt
+COPY requirement.txt /code/requirement.txt
 RUN pip3 install -r requirement.txt
 
 # Set python alias
