@@ -9,6 +9,7 @@ WORKDIR /code
 RUN apt-get update -y
 RUN pip install --upgrade pip
 COPY requirement.txt /code/requirement.txt
+COPY setup.sh /code/setup.sh
 RUN pip3 install -r requirement.txt
 
 # Set python alias
