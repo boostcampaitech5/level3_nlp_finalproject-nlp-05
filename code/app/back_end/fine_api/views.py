@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from .serializers import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 import jwt
 from django.contrib.auth import authenticate
@@ -17,6 +17,8 @@ from allauth.socialaccount.models import SocialAccount
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.google import views as google_view
+from datetime import date
+from django.core.exceptions import ObjectDoesNotExist
 
 class RegisterAPIView(APIView):
     def post(self, request):
@@ -206,3 +208,63 @@ class GoogleLogin(SocialLoginView):
     adapter_class = google_view.GoogleOAuth2Adapter
     callback_url = GOOGLE_CALLBACK_URI
     client_class = OAuth2Client
+
+class ChatMessageViewSet(viewsets.ModelViewSet):
+    serializer_class = ChatMessageSerializer
+
+    def get_queryset(self):
+        user_id = self.request.query_params.get('user_id')
+        if user_id:
+            try:
+                user = UserProfile.objects.get(id=user_id)
+                return ChatMessage.objects.filter(user=user)
+            except ObjectDoesNotExist:
+                return ChatMessage.objects.none()
+        else:
+            return ChatMessage.objects.none()
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id')
+        user = get_user_by_id(user_id)
+        if user is None:
+            return Response({"error": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        request_data = request.data.copy()
+        request_data['user'] = user.id
+        serializer = self.get_serializer(data=request_data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class CombinedChatViewSet(viewsets.ViewSet):
+    def create(sself, request):
+        user_id = request.query_params.get('user_id')
+
+        try:
+            user = UserProfile.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({"error": "User does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        today = date.today()
+        chat_messages = ChatMessage.objects.filter(
+            user=user, created_at__date=today)
+        combined_message = ''.join(
+            [message.message for message in chat_messages])
+
+        combined_chat = CombinedChat.objects.create(
+            combined_message=combined_message, user=user)
+
+        combined_chat.save()
+
+        serializer = CombinedChatSerializer(combined_chat)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def get_user_by_id(user_id):
+    try:
+        user = UserProfile.objects.get(id=user_id)
+        return user
+    except UserProfile.DoesNotExist:
+        return None

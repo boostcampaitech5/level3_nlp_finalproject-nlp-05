@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.conf import settings
+from django.utils import timezone
 
 class UserProfileManager(BaseUserManager):
     def create_user(self, email, password, **kwargs):
@@ -39,3 +41,21 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     objects = UserProfileManager()
 
     USERNAME_FIELD = 'email'
+
+class ChatMessage(models.Model):
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.message
+
+class CombinedChat(models.Model):
+    combined_message = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.combined_message
