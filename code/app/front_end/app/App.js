@@ -1,36 +1,89 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+import { Platform, Dimensions, StatusBar, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ChatBot from './screens/ChatBot'
+import Feed from './screens/Feed'
+import styled, { ThemeProvider } from 'styled-components/native';
+import { getTheme } from './utils/theme';
 
-// Screen Components
-const HomeScreen = () => <Text>first</Text>;
-const Screen1 = () => <Text>screen 1</Text>;
-const Screen2 = () => <Text>screen 2</Text>;
+const SCREEN_WIDTH = Dimensions.get('window').width;
+
+const w8 = SCREEN_WIDTH * 0.007;
+const w16 = SCREEN_WIDTH * 0.015;
+const w24 = SCREEN_WIDTH * 0.022;
+const w28 = SCREEN_WIDTH * 0.026;
+const w32 = SCREEN_WIDTH * 0.030;
+const w48 = SCREEN_WIDTH * 0.044;
+const w64 = SCREEN_WIDTH * 0.059;
+const w92 = SCREEN_WIDTH * 0.086;
+const w96 = SCREEN_WIDTH * 0.089;
+const w160 = SCREEN_WIDTH * 0.148;
+
+const theme = getTheme()
 
 // Loading Component
 const LoadingScreen = () => (
   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <ActivityIndicator size="large" />
+    <ActivityIndicator size='large' />
     <Text>Loading...</Text>
   </View>
 );
 
 // Tab Navigator
-// const Tab = createBottomTabNavigator();
+// const Tab = createTabNavigator();
 
 // Main Stack Navigator
-// const Stack = createNativeStackNavigator();
 const Stack = createNativeStackNavigator();
-const BottomTab = createBottomTabNavigator();
+const Tab = createMaterialTopTabNavigator();
 
-const BottomTabNavigator = () => {
+const TabNavigator = () => {
   return (
-    <BottomTab.Navigator initialRouteName="Screen1">
-      <BottomTab.Screen name="Screen1" component={Screen1} />
-      <BottomTab.Screen name="Screen2" component={Screen2} />
-    </BottomTab.Navigator>
+    <Container>
+      <StatusBar translucent backgroundColor='transparent' />
+      <Tab.Navigator
+        initialRouteName='ChatBot'
+        screenOptions={{
+          tabBarShowIcon: true,
+          tabBarShowLabel: false,
+          tabBarStyle: {
+            height: w160,
+            backgroundColor: 'transparent',
+            position: 'absolute',
+            top: w92,
+            left: 0,
+            right: 0,
+            paddingTop: 4
+          },
+          tabBarIndicatorStyle: {
+            backgroundColor: '#fbfbfb'
+          }
+        }}>
+        <Tab.Screen
+          name='ChatBot'
+          component={ChatBot}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({ focused }) => (
+              <Icon source={focused ? require('./assets/chat-active-icon.png')
+                : require('./assets/chat-icon.png')} />
+            )
+          }}
+        />
+        <Tab.Screen
+          name='Feed'
+          component={Feed}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({ focused }) => (
+              <Icon source={focused ? require('./assets/feed-active-icon.png')
+                : require('./assets/feed-icon.png')} />
+            )
+          }}
+        />
+      </Tab.Navigator>
+    </Container>
   )
 }
 
@@ -42,6 +95,7 @@ const App = () => {
     setTimeout(() => {
       setIsLoading(false);
     }, 3000);
+    console.log(theme)
   }, []);
 
   if (isLoading) {
@@ -49,35 +103,24 @@ const App = () => {
   }
 
   return (
-    <NavigationContainer
-      theme={DefaultTheme}>
-      <Stack.Navigator initialRouteName='Screen1'>
-        <Stack.Screen name="Root" component={BottomTabNavigator} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ThemeProvider theme={theme}>
+      <NavigationContainer
+        theme={DefaultTheme}>
+        <Stack.Navigator initialRouteName='ChatBot'>
+          <Stack.Screen name='Root' component={TabNavigator} options={{headerShown: false}} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ThemeProvider>
   );
 };
 
+const Container = styled.View`
+  flex: 1;
+`
+
+const Icon = styled.Image`
+  width: ${w64}px;
+  height: ${w64}px;
+`
+
 export default App;
-
-
-// import { StatusBar } from 'expo-status-bar';
-// import { StyleSheet, Text, View } from 'react-native';
-
-// export default function App() {
-//   return (
-//     <View style={styles.container}>
-//       <Text>Hello World</Text>
-//       <StatusBar style="auto" />
-//     </View>
-//   );
-// }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
