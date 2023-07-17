@@ -44,3 +44,12 @@ web-build/
 dockerfile:Zone.Identifier
 final_project_keypair.pem
 final_project_keypair.pem:Zone.Identifier
+
+mecab-0.996-ko-0.9.2.tar.gz
+mecab-0.996-ko-0.9.2
+prediction
+results
+wandb
+best_model
+data
+ignore_folder
