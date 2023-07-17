@@ -47,6 +47,7 @@ const TabNavigator = () => {
         screenOptions={{
           tabBarShowIcon: true,
           tabBarShowLabel: false,
+          swipeEnabled: false,
           tabBarStyle: {
             height: w160,
             backgroundColor: 'transparent',
@@ -94,8 +95,7 @@ const App = () => {
     // Simulating loading time
     setTimeout(() => {
       setIsLoading(false);
-    }, 3000);
-    console.log(theme)
+    }, 100);
   }, []);
 
   if (isLoading) {

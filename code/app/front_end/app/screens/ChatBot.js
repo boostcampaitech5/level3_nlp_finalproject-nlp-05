@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Platform, Dimensions, TextInput } from 'react-native';
+import { TextInput } from 'react-native';
 import styled from 'styled-components/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import { w16, w24, w28, w32, w48, w64, w96, androidHeader, iosHeader } from '../utils/theme'
+import Container from '../components/Container'
+import Header from '../components/Header'
 
 const ChatBot = () => {
-  const [messages, setMessages] = useState([{ id: 1, text: '안녕하세요', sender: 'bot' }]);
+  const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const scrollViewRef = useRef(null);
 
@@ -35,30 +37,11 @@ const ChatBot = () => {
       });
 
       res_message = { id: Date.now(), text: res.data.message, sender: 'bot' };
-      // response 처리, message에 저장
-      // const res = { id: Date.now() + 1, text: Platform.OS, sender: 'bot' };
       setMessages((prevMessages) => [...prevMessages, res_message]);
     } catch (error) {
       console.error(error);
     }
   };
-
-  // const handleSend = () => {
-  //   const url = 'http://ec2-43-201-149-19.ap-northeast-2.compute.amazonaws.com/api/user/api/chat/send/';
-  //   const data = new URLSearchParams();
-  //   data.append('input_text', 'dddd');
-    
-  //   axios.post(url, data, {
-  //     headers: {
-  //       'Content-Type': 'application/x-www-form-urlencoded'
-  //     }})
-  //     .then(response => {
-  //       console.log(response.data);
-  //     })
-  //     .catch(error => {
-  //       console.error('Error:', error);
-  //     });
-  // }
 
   const handleImage = async () => {
     try {
@@ -80,26 +63,22 @@ const ChatBot = () => {
 
   return (
     <Container>
-      <Header />
+      <Header view='chatbot' />
 
-      <MessagesOuterContainer>
-        <MessagesContainer
-          ref={scrollViewRef}
-        >
-            {messages.map((message) => (
-              <MessageContent key={message.id} sender={message.sender}>
-                {message.sender === 'bot' && (
-                  <BotProfile>
-                    <Logo source={require('../assets/logo-small.png')} />
-                  </BotProfile>
-                )}
-                <Message key={message.id} sender={message.sender}>
-                  <MessageText>{message.text}</MessageText>
-                </Message>
-              </MessageContent>
-            ))}
-        </MessagesContainer>
-      </MessagesOuterContainer>
+      <MessagesContainer ref={scrollViewRef}>
+          {messages.map(message => (
+            <MessageContent key={message.id} sender={message.sender}>
+              {message.sender === 'bot' && (
+                <BotProfile>
+                  <Logo source={require('../assets/logo-small.png')} />
+                </BotProfile>
+              )}
+              <Message key={message.id} sender={message.sender}>
+                <MessageText>{message.text}</MessageText>
+              </Message>
+            </MessageContent>
+          ))}
+      </MessagesContainer>
 
       <InputContainer>
           <Input
@@ -126,27 +105,9 @@ const ChatBot = () => {
   );
 };
 
-const Container = styled.View`
-  flex: 1;
-`
-
-const Header = styled(LinearGradient).attrs(({ theme }) => ({
-  colors: [theme.secondaryBackground, theme.primaryBackground],
-  start: { x: 0, y: 0 },
-  end: { x: 1, y: 1 },
-}))`
-  height: ${Platform.OS === 'android' ? androidHeader : iosHeader }px;
-  padding-top: ${Platform.OS === 'android' ? w96 : 0}px;
-`
-
-const MessagesOuterContainer = styled.View`
-  flex: 1;
-  padding-bottom: ${w28}px;
-`
-
 const MessagesContainer = styled.ScrollView`
   flex: 1;
-  padding: ${w28}px ${w28}px;
+  padding: ${w28}px ${w28}px ${w64}px;
 `
 
 const MessageContent = styled.View`
@@ -192,7 +153,8 @@ const InputContainer = styled(LinearGradient).attrs(({ theme }) => ({
 
   flex-direction: row;
   align-items: center;
-  margin: 0 ${w32}px ${w28}px ${w28}px;
+  margin: ${w28}px;
+  margin-right: ${w32}px;
   padding: ${w16}px;
   padding-right: ${w28}px;
   border-radius: 24px;

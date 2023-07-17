@@ -1,224 +1,119 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Platform, Dimensions, TextInput } from 'react-native';
+import { ScrollView } from 'react-native';
 import styled from 'styled-components/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
-import { w16, w24, w28, w32, w48, w64, w96, androidHeader, iosHeader } from '../utils/theme'
+import { w8, w14, w16, w24, w28, w32, w48, w64, w78, w96, w108, w144, androidHeader, iosHeader } from '../utils/theme'
+import Container from '../components/Container'
+import Header from '../components/Header'
+
+const getLastDates = (today) => {
+  const oneMonthAgo = new Date(today);
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+  oneMonthAgo.setDate(oneMonthAgo.getDate() + 1);
+
+  const dates = [];
+  const days = [];
+  for (; oneMonthAgo <= today; oneMonthAgo.setDate(oneMonthAgo.getDate() + 1)) {
+    dates.push(oneMonthAgo.getDate());
+    days.push(oneMonthAgo.getDay());
+  }
+  
+  const daysToKorean = ['일', '월', '화', '수', '목', '금', '토'];
+  const kdays = days.map(d => daysToKorean[d]);
+  return [dates, kdays];
+}
+
+// const dummyfeed
 
 const Feed = () => {
-  const [messages, setMessages] = useState([{ id: 1, text: '안녕하세요', sender: 'bot' }]);
-  const [inputText, setInputText] = useState('');
-  const scrollViewRef = useRef(null);
+  const [today, setToday] = useState(new Date())
+  
+  const [lastDates, lastDays] = getLastDates(today);
+  const [dates, setDates] = useState(lastDates);
+  const [days, setDays] = useState(lastDays);
+  const [feeds, setFeeds] = useState([]);
+  
+  const datesScrollRef = useRef(null);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    datesScrollToRight();
+  });
 
-  const scrollToBottom = () => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: true });
+  const datesScrollToRight = () => {
+    if (datesScrollRef.current) {
+      datesScrollRef.current.scrollToEnd({ animated: true });
     }
-  };
-
-  const handleSend = async () => {
-    try {
-      const message = { id: Date.now(), text: inputText, sender: 'user' };
-      setMessages((prevMessages) => [...prevMessages, message]);
-      setInputText('');
-      
-      const res = await axios.post('http://ec2-43-201-149-19.ap-northeast-2.compute.amazonaws.com/api/user/api/chat/send/', {
-        input_text: inputText
-      }, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
-
-      res_message = { id: Date.now(), text: res.data.message, sender: 'bot' };
-      // response 처리, message에 저장
-      // const res = { id: Date.now() + 1, text: Platform.OS, sender: 'bot' };
-      setMessages((prevMessages) => [...prevMessages, res_message]);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  // const handleSend = () => {
-  //   const url = 'http://ec2-43-201-149-19.ap-northeast-2.compute.amazonaws.com/api/user/api/chat/send/';
-  //   const data = new URLSearchParams();
-  //   data.append('input_text', 'dddd');
-    
-  //   axios.post(url, data, {
-  //     headers: {
-  //       'Content-Type': 'application/x-www-form-urlencoded'
-  //     }})
-  //     .then(response => {
-  //       console.log(response.data);
-  //     })
-  //     .catch(error => {
-  //       console.error('Error:', error);
-  //     });
-  // }
-
-  const handleImage = async () => {
-    try {
-      const userID = 'admin';
-      const userPW = '1234';
-      const res = await axios.get('https://...', {
-        id: userID,
-        pw: userPW
-      })
-      setMessages((prevMessages) => [...prevMessages, res]);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleVoice = async () => {
-
   };
 
   return (
     <Container>
-      <Header />
+      <Header view='feed' />
 
-      <MessagesOuterContainer>
-        <MessagesContainer
-          ref={scrollViewRef}
-        >
-            {messages.map((message) => (
-              <MessageContent key={message.id} sender={message.sender}>
-                {message.sender === 'bot' && (
-                  <BotProfile>
-                    <Logo source={require('../assets/logo-small.png')} />
-                  </BotProfile>
-                )}
-                <Message key={message.id} sender={message.sender}>
-                  <MessageText>{message.text}</MessageText>
-                </Message>
-              </MessageContent>
-            ))}
-        </MessagesContainer>
-      </MessagesOuterContainer>
-
-      <InputContainer>
-          <Input
-            value={inputText}
-            multiline={true}
-            onChangeText={setInputText}
-          />
-          {inputText ? (
-            <Button onPress={handleSend}>
-              <Icon source={require('../assets/send-icon.png')} />
-            </Button>
-          ) : (
-            <>
-              <Button onPress={handleImage}>
-                <Icon source={require('../assets/image-icon.png')} />
-              </Button>
-              <Button onPress={handleVoice}>
-                <Icon source={require('../assets/mic-icon.png')} />
-              </Button>
-            </>
-          )}
-      </InputContainer>
+      <DatesScrollContainer>
+        <DatesScroll horizontal showsHorizontalScrollIndicator={false} ref={datesScrollRef}>
+          {dates.map((date, idx) => (
+            <DateContainer key={date}>
+              <DayText>
+                {days[idx]}
+              </DayText>
+              <DateText>
+                {date}
+              </DateText>
+            </DateContainer>
+          ))}
+        </DatesScroll>
+      </DatesScrollContainer>
+      <SelectedDate>
+        {today.getFullYear()}. {today.getMonth() + 1}. {today.getDate()}.
+      </SelectedDate>
     </Container>
   );
 };
 
-const Container = styled.View`
-  flex: 1;
+const DatesScrollContainer = styled.View`
+  height: ${w96 * 2}px;
+  border-bottom-width: 1px;
+  border-bottom-color: black;
 `
 
-const Header = styled(LinearGradient).attrs(({ theme }) => ({
-  colors: [theme.secondaryBackground, theme.primaryBackground],
-  start: { x: 0, y: 0 },
-  end: { x: 1, y: 1 },
-}))`
-  height: ${Platform.OS === 'android' ? androidHeader : iosHeader }px;
-  padding-top: ${Platform.OS === 'android' ? w96 : 0}px;
-`
-
-const MessagesOuterContainer = styled.View`
-  flex: 1;
-  padding-bottom: ${w28}px;
-`
-
-const MessagesContainer = styled.ScrollView`
-  flex: 1;
-  padding: ${w28}px ${w28}px;
-`
-
-const MessageContent = styled.View`
+const DatesScroll = styled(ScrollView).attrs({
+  contentContainerStyle: {
+    paddingRight: w64,
+    paddingLeft: w64
+  }
+})`
   flex: 1;
   flex-direction: row;
-  justify-content: ${props => (props.sender === 'user' ? 'flex-end' : 'flex-start')};
-  margin-bottom: ${w28}px;
+  padding-top: ${w16}px;
 `
 
-const BotProfile = styled.View`
-  width: ${w96}px;
-  height: ${w96}px;
-  margin-right: ${w28}px;
-  border-radius: 14px;
-  background-color: ${({ theme }) => theme.secondary};
-  justify-content: center;
+const DateContainer = styled.View`
+  flex: 1;
   align-items: center;
-`
-
-const Logo = styled.Image`
-  width: ${w64}px;
-  height: ${w64}px;
-`
-
-const Message = styled.View`
-  background-color: ${({ theme, sender }) => (sender === 'user' ? theme.primary : theme.secondary)};
+  width: ${w108}px;
+  height: ${w144}px;
+  margin: ${w16}px ${w14}px;
+  padding-top: ${w8}px;
   border-radius: ${w48}px;
-  padding: ${w24}px ${w28}px;
-  max-width: ${({ sender }) => (sender === 'user' ? 66.7 : 58.5)}%;
-  min-width: ${w96}px;
+  
+  background-color: ${({ theme }) => theme.secondary};
 `
 
-const MessageText = styled.Text`
-  color: white;
-  font-size: 16px;
+const DayText = styled.Text`
+  font-size: 11px;
+  color: ${({ theme }) => theme.background};
+`
+const DateText = styled.Text`
+  font-size: 21px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.background};
 `
 
-const InputContainer = styled(LinearGradient).attrs(({ theme }) => ({
-  colors: [theme.secondaryBackground, theme.primaryBackground],
-  start: { x: 0, y: 0 },
-  end: { x: 1, y: 1 },
-}))`
-
-  flex-direction: row;
-  align-items: center;
-  margin: 0 ${w32}px ${w28}px ${w28}px;
-  padding: ${w16}px;
-  padding-right: ${w28}px;
-  border-radius: 24px;
-`
-
-const Input = styled(TextInput).attrs(({ theme }) => ({
-  cursorColor: theme.secondaryBackground,
-  selectionColor: theme.secondaryBackground
-}))`
-  flex: 1;
-  background-color: ${({ theme }) => theme.background};
-  border-radius: 20px;
-  padding: ${w16}px ${w48}px;
-  font-size: 16px;
-`
-
-const Button = styled.TouchableOpacity`
-  width: ${w96}px;
-  height: ${w96}px;
-  margin-left: ${w16}px;
-  padding: ${w16}px;
-`
-
-const Icon = styled.Image`
-  width: 100%;
-  height: 100%;
+const SelectedDate = styled.Text`
+  font-size: ${w108}px;
+  font-weight: 600;
+  padding: ${w32}px ${w28}px ${w64}px;
 `
 
 export default Feed

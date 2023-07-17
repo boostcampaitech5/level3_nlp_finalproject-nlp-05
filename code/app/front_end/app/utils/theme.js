@@ -52,12 +52,17 @@ export const getTheme = () => {
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
+export const w8 = SCREEN_WIDTH * 0.007;
+export const w14 = SCREEN_WIDTH * 0.013;
 export const w16 = SCREEN_WIDTH * 0.015;
 export const w24 = SCREEN_WIDTH * 0.022;
 export const w28 = SCREEN_WIDTH * 0.026;
 export const w32 = SCREEN_WIDTH * 0.030;
 export const w48 = SCREEN_WIDTH * 0.044;
 export const w64 = SCREEN_WIDTH * 0.059;
+export const w78 = SCREEN_WIDTH * 0.072;
 export const w96 = SCREEN_WIDTH * 0.089;
+export const w108 = SCREEN_WIDTH * 0.100;
+export const w144 = SCREEN_WIDTH * 0.133;
 export const androidHeader = SCREEN_WIDTH * 0.233;
 export const iosHeader = SCREEN_WIDTH * 0.148;
