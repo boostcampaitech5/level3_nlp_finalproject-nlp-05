@@ -20,6 +20,7 @@
 npm-debug.log
 sdk-cmdline-tools
 .git-credentials
+wandb/
 
 # react-native
 node_modules/
@@ -38,3 +39,7 @@ web-build/
 
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
+
+# Dataset
+explanation/
+*.tsv
