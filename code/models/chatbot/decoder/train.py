@@ -94,7 +94,7 @@ def train(CFG):
         compute_metrics=evaluation.compute_metrics,
         preprocess_logits_for_metrics=evaluation.preprocess_logits_for_metrics,
         data_collator=data_collator,
-        optimizers= (optimizer, lr_scheduler)
+        #optimizers= (optimizer, lr_scheduler)
     )
     
     trainer.train()
