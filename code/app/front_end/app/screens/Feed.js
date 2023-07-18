@@ -212,12 +212,15 @@ const FeedContainer = styled.View`
 
 const FeedTime = styled.Text`
   padding-left: ${w64}px;
-  font-size: ${w84}px;
+  padding-bottom: ${w28}px;
+  font-size: ${w96}px;
+  font-family: HandWriting;
 `
 
 const FeedText = styled.Text`
-  padding-left: ${w84}px;
-  font-size: 16px;
+  padding: 0 ${w84}px;
+  font-size: 18px;
+  font-family: HandWriting;
 `
 
 export default Feed
