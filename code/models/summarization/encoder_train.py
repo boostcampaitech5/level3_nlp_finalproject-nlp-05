@@ -6,6 +6,7 @@ import numpy as np
 import wandb
 from load_data import Dataset, preprocessing, data_load
 from models import Encoder_model
+from custom_tokenizer import custom_tokenizer
 
 
 def train():
@@ -17,13 +18,8 @@ def train():
         torch.cuda.manual_seed_all(seed)
 
 
-    add_special_tokens = {'sep_token' : "<sep>",
-                        "cls_token" : "<cls>"}
-
-
     model_name = "gogamza/kobart-base-v2"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    tokenizer.add_special_tokens(add_special_tokens)
+    tokenizer = custom_tokenizer(model_name)
         
     # data 불러오기
     
@@ -45,24 +41,27 @@ def train():
     encoder_model.to(device)
     print(device)
 
+    wandb.init(project="final")
+    wandb.run.name = 'text_similarity_training, lr=7e-6, batch=64,'
     training_args = TrainingArguments(
                 output_dir="/opt/ml/code/models/summarization/output",
                 save_total_limit=3,
-                save_steps=100,
-                num_train_epochs=1,
+                save_steps=50,
+                num_train_epochs=10,
                 learning_rate=7e-6,
-                per_device_train_batch_size=16,
-                per_device_eval_batch_size=16,
-                warmup_steps=100,
+                per_device_train_batch_size=64,
+                per_device_eval_batch_size=64,
+                warmup_steps=50,
                 weight_decay=0.1,
                 logging_dir="/opt/ml/code/models/summarization/log",
-                logging_steps=100,
+                logging_steps=50,
                 logging_strategy='steps',
                 save_strategy='steps',
                 evaluation_strategy='steps',
-                eval_steps=100,
+                eval_steps=50,
                 load_best_model_at_end=True,
-                metric_for_best_model='loss')
+                metric_for_best_model='loss',
+                report_to='wandb')
 
 
 
