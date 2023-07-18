@@ -1,50 +1,105 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ScrollView } from 'react-native';
 import styled from 'styled-components/native';
-import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
-import { w8, w14, w16, w24, w28, w32, w48, w64, w78, w96, w108, w144, androidHeader, iosHeader } from '../utils/theme'
+import { w8, w14, w16, w28, w32, w48, w64, w84, w96, w108, w144 } from '../utils/theme'
 import Container from '../components/Container'
 import Header from '../components/Header'
 
-const getLastDates = (today) => {
-  const oneMonthAgo = new Date(today);
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-  oneMonthAgo.setDate(oneMonthAgo.getDate() + 1);
+const getLastDates = today => {
+  const date = new Date(today);
+  date.setMonth(date.getMonth() - 1);
+  date.setDate(date.getDate() + 1);
 
   const dates = [];
-  const days = [];
-  for (; oneMonthAgo <= today; oneMonthAgo.setDate(oneMonthAgo.getDate() + 1)) {
-    dates.push(oneMonthAgo.getDate());
-    days.push(oneMonthAgo.getDay());
+  for (; date <= today; date.setDate(date.getDate() + 1)) {
+    dates.push(new Date(date));
   }
   
-  const daysToKorean = ['일', '월', '화', '수', '목', '금', '토'];
-  const kdays = days.map(d => daysToKorean[d]);
-  return [dates, kdays];
+  return dates;
 }
 
-// const dummyfeed
+const getMonthDates = selectedDate => {
+  const date = new Date(selectedDate);
+  date.setDate(1);
+
+  const dates = [];
+  for (; date.getMonth() < selectedDate.getMonth(); date.setDate(date.getDate() + 1)) {
+    dates.push(new Date(date));
+  }
+
+  return dates;
+}
+
+const dayToKorean = date => {
+  const korean = ['일', '월', '화', '수', '목', '금', '토'];
+
+  return korean[date.getDay()];
+}
+
+const dummyfeed = [
+  [
+    {
+      time: '12:34',
+      text: '오늘은 18일이다. 오늘은 18일이다. \n오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다.'
+    },
+    {
+      time: '11:32',
+      text: '배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. '
+    }
+  ],
+  [
+    {
+      time: '12:34',
+      text: '오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다.'
+    },
+    {
+      time: '11:32',
+      text: '배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. '
+    }
+  ]
+]
 
 const Feed = () => {
   const [today, setToday] = useState(new Date())
+  const [selectedDate, setSelectedDate] = useState(today)
   
-  const [lastDates, lastDays] = getLastDates(today);
-  const [dates, setDates] = useState(lastDates);
-  const [days, setDays] = useState(lastDays);
+  const [dates, setDates] = useState(getLastDates(today));
+  const [monthFeeds, setMonthFeeds] = useState([]);
   const [feeds, setFeeds] = useState([]);
   
   const datesScrollRef = useRef(null);
 
   useEffect(() => {
     datesScrollToRight();
-  });
+    
+    // dates에 해당하는 monthFeeds 받아오기
+    setMonthFeeds(dummyfeed);
+    // selectedDate에 해당하는 feeds 받아오기
+    setFeeds(dummyfeed[0]);
+  }, []);
 
   const datesScrollToRight = () => {
     if (datesScrollRef.current) {
-      datesScrollRef.current.scrollToEnd({ animated: true });
+      datesScrollRef.current.scrollToEnd();
     }
   };
+
+  const getMonthFeed = () => {
+    // state update 순서 주의. calendar를 통해 진입 시 인자 올바르게 넣을 것
+    setMonthFeeds(dummyfeed)
+  }
+
+  const handleSelectDate = date => {
+    setSelectedDate(date)
+    
+    // selectDate에 해당하는 feeds 받아오기
+    setFeeds(monthFeeds[1]);
+  }
+
+  const handleCalendar = date => {
+    
+  }
 
   return (
     <Container>
@@ -53,20 +108,40 @@ const Feed = () => {
       <DatesScrollContainer>
         <DatesScroll horizontal showsHorizontalScrollIndicator={false} ref={datesScrollRef}>
           {dates.map((date, idx) => (
-            <DateContainer key={date}>
-              <DayText>
-                {days[idx]}
+            <DateContainer
+              key={idx}
+              date={date}
+              selectedDate={selectedDate}
+              onPress={() => handleSelectDate(date, idx)}>
+              <DayText date={date} selectedDate={selectedDate}>
+                {dayToKorean(date)}
               </DayText>
-              <DateText>
-                {date}
+              <DateText date={date} selectedDate={selectedDate}>
+                {date.getDate()}
               </DateText>
             </DateContainer>
           ))}
         </DatesScroll>
       </DatesScrollContainer>
-      <SelectedDate>
-        {today.getFullYear()}. {today.getMonth() + 1}. {today.getDate()}.
-      </SelectedDate>
+      <SelectedDateContainer>
+        <SelectedDate onPress={handleCalendar}>
+          <SelectedDateText>
+            {selectedDate.getFullYear()}. {selectedDate.getMonth() + 1}. {selectedDate.getDate()}.
+          </SelectedDateText>
+        </SelectedDate>
+      </SelectedDateContainer>
+      <FeedsScroll>
+        {feeds && feeds.map((feed, idx) => (
+          <FeedContainer key={idx}>
+            <FeedTime>
+              {feed.time}
+            </FeedTime>
+            <FeedText>
+              {feed.text}
+            </FeedText>
+          </FeedContainer>
+        ))}
+      </FeedsScroll>
     </Container>
   );
 };
@@ -74,7 +149,7 @@ const Feed = () => {
 const DatesScrollContainer = styled.View`
   height: ${w96 * 2}px;
   border-bottom-width: 1px;
-  border-bottom-color: black;
+  border-bottom-color: ${({ theme }) => theme.gray};
 `
 
 const DatesScroll = styled(ScrollView).attrs({
@@ -88,7 +163,7 @@ const DatesScroll = styled(ScrollView).attrs({
   padding-top: ${w16}px;
 `
 
-const DateContainer = styled.View`
+const DateContainer = styled.TouchableOpacity`
   flex: 1;
   align-items: center;
   width: ${w108}px;
@@ -97,23 +172,52 @@ const DateContainer = styled.View`
   padding-top: ${w8}px;
   border-radius: ${w48}px;
   
-  background-color: ${({ theme }) => theme.secondary};
+  background-color: ${({ date, selectedDate, theme }) => 
+    date.getDate() === selectedDate.getDate() ? theme.secondary : theme.background};
 `
 
 const DayText = styled.Text`
   font-size: 11px;
-  color: ${({ theme }) => theme.background};
+  color: ${({ date, selectedDate, theme }) => 
+    date.getDate() === selectedDate.getDate() ? theme.background : 'black'};
 `
 const DateText = styled.Text`
   font-size: 21px;
   font-weight: 600;
-  color: ${({ theme }) => theme.background};
+  color: ${({ date, selectedDate, theme }) => 
+    date.getDate() === selectedDate.getDate() ? theme.background : 'black'};
 `
 
-const SelectedDate = styled.Text`
+const SelectedDateContainer = styled.View`
+  padding: ${w16}px ${w28}px ${w28}px;
+  border-bottom-width: 1px;
+  border-bottom-color: ${({ theme }) => theme.gray};
+`
+
+const SelectedDate = styled.TouchableOpacity``
+
+const SelectedDateText = styled.Text`
   font-size: ${w108}px;
   font-weight: 600;
-  padding: ${w32}px ${w28}px ${w64}px;
+`
+
+const FeedsScroll = styled.ScrollView`
+  flex: 1;
+`
+
+const FeedContainer = styled.View`
+  flex: 1;
+  padding: ${w32}px 0;
+`
+
+const FeedTime = styled.Text`
+  padding-left: ${w64}px;
+  font-size: ${w84}px;
+`
+
+const FeedText = styled.Text`
+  padding-left: ${w84}px;
+  font-size: 16px;
 `
 
 export default Feed

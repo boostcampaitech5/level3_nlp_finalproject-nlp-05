@@ -3,7 +3,7 @@ import { TextInput } from 'react-native';
 import styled from 'styled-components/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
-import { w16, w24, w28, w32, w48, w64, w96, androidHeader, iosHeader } from '../utils/theme'
+import { w16, w24, w28, w32, w48, w64, w96 } from '../utils/theme'
 import Container from '../components/Container'
 import Header from '../components/Header'
 
@@ -18,7 +18,7 @@ const ChatBot = () => {
 
   const scrollToBottom = () => {
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: true });
+      scrollViewRef.current.scrollToEnd();
     }
   };
 
@@ -44,17 +44,7 @@ const ChatBot = () => {
   };
 
   const handleImage = async () => {
-    try {
-      const userID = 'admin';
-      const userPW = '1234';
-      const res = await axios.get('https://...', {
-        id: userID,
-        pw: userPW
-      })
-      setMessages((prevMessages) => [...prevMessages, res]);
-    } catch (error) {
-      console.error(error);
-    }
+    
   };
 
   const handleVoice = async () => {

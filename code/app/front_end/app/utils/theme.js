@@ -47,10 +47,13 @@ export const getTheme = () => {
   else {
     theme = eveningTheme;
   }
-  return theme;
+  return {
+    ...theme,
+    gray: '#DADCE0'
+  };
 }
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
+export const SCREEN_WIDTH = Dimensions.get('window').width;
 
 export const w8 = SCREEN_WIDTH * 0.007;
 export const w14 = SCREEN_WIDTH * 0.013;
@@ -60,9 +63,11 @@ export const w28 = SCREEN_WIDTH * 0.026;
 export const w32 = SCREEN_WIDTH * 0.030;
 export const w48 = SCREEN_WIDTH * 0.044;
 export const w64 = SCREEN_WIDTH * 0.059;
-export const w78 = SCREEN_WIDTH * 0.072;
+export const w84 = SCREEN_WIDTH * 0.078;
+export const w92 = SCREEN_WIDTH * 0.085;
 export const w96 = SCREEN_WIDTH * 0.089;
 export const w108 = SCREEN_WIDTH * 0.100;
 export const w144 = SCREEN_WIDTH * 0.133;
+export const w160 = SCREEN_WIDTH * 0.148;
 export const androidHeader = SCREEN_WIDTH * 0.233;
 export const iosHeader = SCREEN_WIDTH * 0.148;
