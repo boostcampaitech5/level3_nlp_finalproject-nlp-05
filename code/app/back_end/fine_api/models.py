@@ -4,21 +4,23 @@ from django.conf import settings
 from django.utils import timezone
 
 class UserProfileManager(BaseUserManager):
-    def create_user(self, email, password, **kwargs):
+    def create_user(self, email, password, name, **kwargs):
         if not email:
             raise ValueError('Users must have an email address')
         user = self.model(
-            email=email
+            email=email,
+            name=name
         )
         user.set_password(password)
         user.save(using=self._db)
 
         return user
 
-    def create_superuser(self, email=None, password=None, **extra_fields):
+    def create_superuser(self, email=None, password=None, name=name, **extra_fields):
         superuser = self.create_user(
             email=email,
-            password=password
+            password=password,
+            name=name
         )
         
         superuser.is_staff = True
@@ -32,6 +34,7 @@ class UserProfileManager(BaseUserManager):
 class UserProfile(AbstractBaseUser, PermissionsMixin):
     
     email = models.EmailField(max_length=30, unique=True, null=False, blank=False)
+    name = models.CharField(max_length=10, default='')
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -41,6 +44,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     objects = UserProfileManager()
 
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name']
 
 class ChatMessage(models.Model):
     message = models.CharField(max_length=255)

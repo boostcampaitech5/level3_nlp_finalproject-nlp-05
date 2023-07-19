@@ -1,9 +1,9 @@
-from rest_framework_simplejwt.views import TokenRefreshView
 from .views import *
 from django.urls import path, include
 from rest_framework import routers
 
 router = routers.DefaultRouter()
+router.register('profile', UserProfileViewSet)
 router.register(r'chat-messages', ChatMessageViewSet, basename='chat-message')
 router.register(r'combined-chats', CombinedChatViewSet,
                 basename='combined-chat')

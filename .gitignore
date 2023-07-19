@@ -44,3 +44,4 @@ web-build/
 dockerfile:Zone.Identifier
 final_project_keypair.pem
 final_project_keypair.pem:Zone.Identifier
+db.sqlite3
