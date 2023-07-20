@@ -1,22 +1,26 @@
 import torch
 import pandas as pd
-
-class Dataset(torch.utils.data.Dataset):
-    def __init__(self, sentence, score):
-        self.sentence = sentence
-        self.score = score
     
-    def __getitem__(self,idx):
+class Dataset(torch.utils.data.Dataset):
+    def __init__(self, score, input_ids, attention_mask, token_type_ids):
+        self.score = score
+        self.input_ids = input_ids
+        self.attention_mask = attention_mask
+        self.token_type_ids = token_type_ids
+    
+    def __getitem__(self, idx):
         item = {
-            'sentence' : self.sentence[idx],
-            'labels' : self.score[idx]
+            "input_ids" : self.input_ids[idx],
+            "attention_mask" : self.attention_mask[idx],
+            "token_type_ids" : self.token_type_ids[idx],
+            "labels" : self.score[idx]
         }
         
         return item
     
     def __len__(self):
         return len(self.score)
-    
+            
     
 def preprocessing(data, tokenizer):
 
@@ -25,14 +29,14 @@ def preprocessing(data, tokenizer):
                        padding=True,
                        max_length=1028,
                        truncation=True,
-              )['input_ids']
+              )
     
     score = data['score']
     
     return output, score
 
 
-def data_load(data_path):
+def data_load(data_path, tokenizer):
     # data 불러오기
     raw = []
 
@@ -54,7 +58,7 @@ def data_load(data_path):
                     "sen1" : sen1,
                     "sen2" : sen2
                     })
-
-    df['full_sen'] = "<cls>" + df['sen1'] + "<sep>" + df['sen2']
+    
+    df['full_sen'] = df['sen1'] + tokenizer.sep_token + df['sen2']
     
     return df
