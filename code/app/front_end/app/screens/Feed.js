@@ -96,6 +96,7 @@ const Feed = () => {
 	const [dates, setDates] = useState(getLastDates(today));
 	const [feeds, setFeeds] = useState([]);
 	const [calendarVisible, setCalendarVisible] = useState(false);
+	const [datesScrollOffset, setDatesScrollOffset] = useState(0);
 
 	const datesScrollRef = useRef(null);
 
@@ -104,6 +105,21 @@ const Feed = () => {
 		// selectedDate에 해당하는 feeds 받아오기
 		setFeeds(dummyfeed[0]);
 	}, []);
+
+	useEffect(() => {
+		const selectedIndex = dates.findIndex(date => date.getDate() === selectedDate.getDate());
+		const selectedX = selectedIndex * (w108 + w28) + w64;
+
+		const startIndex = datesScrollOffset + w64;
+		const endIndex = datesScrollOffset + w64 + 6 * (w108 + w28);
+
+		if (selectedX < startIndex) {
+			datesScrollRef.current.scrollTo({ x: selectedX - w64, y: 0, animated: true });
+		}
+		else if (selectedX > endIndex) {
+			datesScrollRef.current.scrollTo({ x: selectedX - 6 * (w108 + w28) - w64, y: 0, animated: true });
+		}
+	}, [selectedDate]);
 
 	const datesScrollToRight = () => {
 		if (datesScrollRef.current) {
@@ -135,9 +151,9 @@ const Feed = () => {
 			setDates(getMonthDates(date));
 		}
 		
-		setSelectedDate(date);
 		loadFeeds(date);
 		setCalendarVisible(false);
+		setSelectedDate(date);
 	};
 
 	const onGotoToday = () => {
@@ -151,7 +167,12 @@ const Feed = () => {
 		<Header view='feed' />
 
 		<DatesScrollContainer>
-			<DatesScroll horizontal showsHorizontalScrollIndicator={false} ref={datesScrollRef}>
+			<DatesScroll
+				horizontal
+				showsHorizontalScrollIndicator={false}
+				ref={datesScrollRef}
+				onScroll={e => setDatesScrollOffset(e.nativeEvent.contentOffset.x)}
+			>
 				{dates.map((date, idx) => (
 					<DateContainer
 						key={idx}
