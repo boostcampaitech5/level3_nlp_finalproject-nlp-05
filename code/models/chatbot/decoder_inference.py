@@ -7,12 +7,8 @@ import random
 import argparse
 
 from transformers import (
-    AutoConfig,
     PreTrainedTokenizerFast,
     AutoModelForCausalLM,
-    TrainingArguments,
-    Trainer,
-    DataCollatorForLanguageModeling,
     DataCollatorForSeq2Seq
 )
 
@@ -21,11 +17,9 @@ from seq2seq.compute_metrics import Evaluation_Metrics
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-import warnings
 
-#def calculate_perplexity(probs):
 
-def train(CFG):
+def inference(CFG):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
     MODEL_NAME = CFG['MODEL_NAME']
@@ -40,9 +34,9 @@ def train(CFG):
 
     wandb.init(project=CFG['WANDB_PROJECT'], name=CFG['WANDB_NAME'])
     
-    test_data = load_data(CFG['TEST_PATH'], tokenizer, pre=False)
+    test_data = load_data(CFG['TEST_PATH'])
 
-    tokenized_test, tokenized_test_labels = tokenized_dataset(test_data, tokenizer)
+    tokenized_test, tokenized_test_labels = tokenized_dataset(test_data, tokenizer, CFG['MAX_LENGTH'])
     
     test_dataset = Dataset(tokenized_test, tokenized_test_labels)
     data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer)
@@ -57,17 +51,7 @@ def train(CFG):
         inference_output = model.generate(
                 test_features['input_ids'],
                 max_length=256,
-            )
-
-        #logits = model(input_ids=test_features['input_ids']) # batch_size, max_seq_len, vocab_size
-        #probs, index = torch.max(torch.softmax(logits[0], dim=-1), dim=-1) # batch_size, max_seq_len
-
-        #del logits
-
-        #if (len(predictions) == 0) and (len(labels) == 0):
-        #    predictions = np.array(inference_output[:, test_features['input_ids'].size(-1):].detach().cpu()).tolist()
-        #    labels = np.array(test_features['labels'].detach().cpu()).tolist()
-        #else:
+        )
             
         predictions += np.array(inference_output[:, test_features['input_ids'].size(-1):].detach().cpu()).tolist()
         labels += np.array(test_features['labels'].detach().cpu()).tolist()
@@ -88,11 +72,7 @@ def train(CFG):
     output['prediction'] = decoded_predictions
     output.to_csv('./prediction/prediction.csv') 
 
-    model.save_pretrained(CFG['MODEL_SAVE_DIR'])
-    
 if __name__ == "__main__":
-    warnings.filterwarnings("ignore", category=UserWarning, module="transformers")
-
     parser = argparse.ArgumentParser(description="")
     parser.add_argument(
         "--args_path", default=f"/opt/ml/code/models/chatbot/config.yaml", type=str, help=""
@@ -110,4 +90,4 @@ if __name__ == "__main__":
     torch.backends.cudnn.deterministic = True 
     torch.backends.cudnn.benchmark = True
         
-    train(CFG)
+    inference(CFG)

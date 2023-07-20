@@ -14,23 +14,10 @@ class Dataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.text['input_ids'])
 
-def preprocessing_dataset(df, tokenizer):
-    input_texts = []
-    eos_token = tokenizer.eos_token
-    
-    for idx, row in tqdm(df.iterrows(), total=len(df), desc="Preprocessing Data: "):
-        text = row['input_texts'].replace('</s>', eos_token)
-        input_texts.append(text)
-        
-    out_df = pd.DataFrame({'input_texts': input_texts})
-    
-    return out_df
 
-def load_data(data_dir, tokenizer, pre=False):
+def load_data(data_dir):
     data = pd.read_csv(data_dir)
-    if pre:
-        data = preprocessing_dataset(data, tokenizer)
-
+    
     return data
 
 def tokenized_dataset(data, tokenizer):

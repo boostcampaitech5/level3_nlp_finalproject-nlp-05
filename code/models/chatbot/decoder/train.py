@@ -14,8 +14,6 @@ from transformers import (
     TrainingArguments,
     Trainer,
     DataCollatorForLanguageModeling,
-    AdamW, 
-    get_linear_schedule_with_warmup
 )
 
 from load_data import *
@@ -27,22 +25,16 @@ def train(CFG):
     
     MODEL_NAME = CFG['MODEL_NAME']
     
-    if MODEL_NAME == 'skt/kogpt2-base-v2':
-        tokenizer = PreTrainedTokenizerFast.from_pretrained(MODEL_NAME, eos_token='</s>', pad_token='<pad>')
-    else:
-        tokenizer = PreTrainedTokenizerFast.from_pretrained(MODEL_NAME)
-    
+    tokenizer = PreTrainedTokenizerFast.from_pretrained(MODEL_NAME, 
+                                                        eos_token='</s>', 
+                                                        pad_token='<pad>')
+
     config = AutoConfig.from_pretrained(MODEL_NAME,
                                         eos_token=tokenizer.eos_token,
                                         pad_token=tokenizer.pad_token)
                                                         
     model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, config=config).to(device)
     evaluation = Evaluation_Metrics(tokenizer)
-    
-    if MODEL_NAME == 'nlpai-lab/kullm-polyglot-5.8b-v2':
-        for name, param in model.named_parameters():
-            if 'embed' not in name:
-                param.requires_grad = False 
     
     wandb.init(project=CFG['WANDB_PROJECT'], name=CFG['WANDB_NAME'])
     
@@ -67,10 +59,8 @@ def train(CFG):
     
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
     
-    train_data = load_data(CFG['TRAIN_PATH'], tokenizer,
-                           pre=True if MODEL_NAME == 'nlpai-lab/kullm-polyglot-5.8b-v2' else False)
-    dev_data = load_data(CFG['DEV_PATH'], tokenizer,
-                         pre=True if MODEL_NAME == 'nlpai-lab/kullm-polyglot-5.8b-v2' else False)
+    train_data = load_data(CFG['TRAIN_PATH'])
+    dev_data = load_data(CFG['DEV_PATH'])
     
     tokenized_train = tokenized_dataset(train_data, tokenizer)
     tokenized_dev = tokenized_dataset(dev_data, tokenizer)
@@ -78,13 +68,6 @@ def train(CFG):
     train_dataset = Dataset(tokenized_train)
     dev_dataset = Dataset(tokenized_dev)
     
-    optimizer = AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=training_args.learning_rate, weight_decay=training_args.weight_decay)
-    total_steps = math.ceil(len(train_dataset) / training_args.per_device_train_batch_size) * training_args.num_train_epochs
-    lr_scheduler = get_linear_schedule_with_warmup(
-        optimizer,
-        num_warmup_steps=training_args.warmup_steps,
-        num_training_steps=total_steps
-    )
     
     trainer = Trainer(
         model=model,
@@ -94,7 +77,6 @@ def train(CFG):
         compute_metrics=evaluation.compute_metrics,
         preprocess_logits_for_metrics=evaluation.preprocess_logits_for_metrics,
         data_collator=data_collator,
-        #optimizers= (optimizer, lr_scheduler)
     )
     
     trainer.train()

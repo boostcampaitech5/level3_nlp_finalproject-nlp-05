@@ -17,6 +17,7 @@
 .python_history
 .viminfo
 .wget-hsts
+.jupyter
 npm-debug.log
 sdk-cmdline-tools
 __pycache__
@@ -52,4 +53,5 @@ results
 wandb
 best_model
 data
+KULLM
 ignore_folder

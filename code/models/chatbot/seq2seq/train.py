@@ -56,10 +56,8 @@ def train(CFG):
     
     data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer)
     
-    train_data = load_data(CFG['TRAIN_PATH'], tokenizer,
-                            pre=False if MODEL_NAME == 'gogamza/kobart-base-v2' else True)
-    dev_data = load_data(CFG['DEV_PATH'], tokenizer,
-                            pre=False if MODEL_NAME == 'gogamza/kobart-base-v2' else True)
+    train_data = load_data(CFG['TRAIN_PATH'])
+    dev_data = load_data(CFG['DEV_PATH'])
 
     tokenized_train, tokenized_train_labels = tokenized_dataset(train_data, tokenizer, CFG['MAX_LENGTH'])
     tokenized_dev, tokenized_dev_labels = tokenized_dataset(dev_data, tokenizer, CFG['MAX_LENGTH'])
@@ -74,7 +72,6 @@ def train(CFG):
         eval_dataset=dev_dataset,
         tokenizer=tokenizer,
         compute_metrics=evaluation.compute_metrics,
-        #preprocess_logits_for_metrics=evaluation.preprocess_logits_for_metrics,
         data_collator=data_collator,
     )
     

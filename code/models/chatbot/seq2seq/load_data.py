@@ -17,27 +17,12 @@ class Dataset(torch.utils.data.Dataset):
     return len(self.labels)
 
 
-def preprocessing_dataset(df, tokenizer):
-    input_texts = []
-    labels = []
-    eos_len = len(tokenizer.eos_token)
-    
-    for idx, row in tqdm(df.iterrows(), total=len(df), desc="Preprocessing Data: "):
-        input_texts.append(row['input_texts'][:-eos_len])
-        labels.append(row['labels'][:-eos_len])
-        
-    out_df = pd.DataFrame({'input_texts': input_texts, 'labels': labels})
-
-    return out_df
-
-def load_data(data_dir, tokenizer, pre=True):
+def load_data(data_dir):
     data_df = pd.read_csv(data_dir)
-    if pre:
-      data_df = preprocessing_dataset(data_df, tokenizer)
 
     return data_df
 
-def tokenized_dataset(data, tokenizer, max_length):
+def tokenized_dataset(data, tokenizer, max_length, add_eos=True):
     with tqdm(total=len(data), desc="Tokenizing Text", unit="text") as pbar:
         tokenized_text = tokenizer(
           list(data['input_texts']),
@@ -48,6 +33,10 @@ def tokenized_dataset(data, tokenizer, max_length):
             if len(tokenized_text['input_ids'][i]) > max_length:
                 for key, val in tokenized_text.items():
                     tokenized_text[key][i] = val[i][-max_length:]
+            
+            if add_eos:
+                if tokenized_text['input_ids'][i][-1] != tokenizer.eos_token_id:
+                    tokenized_labels['input_ids'][i].append(tokenizer.eos_token_id)
             
     with tqdm(total=len(data), desc="Tokenizing Labels", unit="text") as pbar:
         with tokenizer.as_target_tokenizer():
@@ -60,5 +49,8 @@ def tokenized_dataset(data, tokenizer, max_length):
             if len(tokenized_labels['input_ids'][i]) > max_length:
                 for key, val in tokenized_labels.items():
                     tokenized_labels[key][i] = val[i][-max_length:]
-
+                    
+            if tokenized_labels['input_ids'][i][-1] != tokenizer.eos_token_id:
+                tokenized_labels['input_ids'][i].append(tokenizer.eos_token_id)
+      
     return tokenized_text, tokenized_labels['input_ids']
