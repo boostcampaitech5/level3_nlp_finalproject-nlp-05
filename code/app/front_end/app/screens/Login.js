@@ -19,7 +19,7 @@ const getLogoPath = () => {
 
 
 const Login = () => {
-    const { isLogin, setIsLogin, loginComplete, setLoginComplete } = useContext(Context);
+    const { isLogin, setIsLogin, loginComplete, setLoginComplete, setUserId } = useContext(Context);
 
     useEffect(() => {
         if (loginComplete) {
@@ -30,6 +30,7 @@ const Login = () => {
     }, [loginComplete])
 
     const handleLogin = () => {
+        setUserId(1);
         setLoginComplete(true);
     };
 

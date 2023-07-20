@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { TextInput } from 'react-native';
 import styled from 'styled-components/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -6,11 +6,13 @@ import axios from 'axios';
 import { w16, w24, w28, w32, w48, w64, w96 } from '../utils/theme'
 import Container from '../components/Container'
 import Header from '../components/Header'
+import { Context } from '../utils/Context';
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const scrollViewRef = useRef(null);
+  const { userId, setUserId } = useContext(Context);
 
   useEffect(() => {
     scrollToBottom();
@@ -28,15 +30,16 @@ const ChatBot = () => {
       setMessages((prevMessages) => [...prevMessages, message]);
       setInputText('');
       
-      const res = await axios.post('http://ec2-43-201-149-19.ap-northeast-2.compute.amazonaws.com/api/user/api/chat/send/', {
-        input_text: inputText
-      }, {
+      const res = await axios.post('http://ec2-43-201-149-19.ap-northeast-2.compute.amazonaws.com/api/user/chat-messages/', {  
+        id: userId,
+        message: inputText
+      }, {  
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
 
-      res_message = { id: Date.now(), text: res.data.message, sender: 'bot' };
+      res_message = { id: Date.now(), text: res.data.chatbot_message, sender: 'bot' };
       setMessages((prevMessages) => [...prevMessages, res_message]);
     } catch (error) {
       console.error(error);
