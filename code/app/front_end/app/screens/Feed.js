@@ -6,6 +6,7 @@ import axios from 'axios';
 import { SCREEN_WIDTH, w8, w14, w16, w28, w32, w48, w64, w84, w96, w108, w144 } from '../utils/theme';
 import Container from '../components/Container';
 import Header from '../components/Header';
+import Icon from '../components/Icon';
 
 const getLastDates = today => {
 	const date = new Date(today);
@@ -110,11 +111,14 @@ const Feed = () => {
 		}
 	};
 
+	const loadFeeds = date => {
+		// date에 해당하는 feeds 받아오기
+		setFeeds(dummyfeed[1]);
+	}
+
 	const onSelectDate = date => {
 		setSelectedDate(date);
-
-		// selectDate에 해당하는 feeds 받아오기
-		setFeeds(dummyfeed[1]);
+		loadFeeds(date);
 	};
 
 	const onSelectCalendar = selectedCalendarDate => {
@@ -128,15 +132,18 @@ const Feed = () => {
 			setDates(getLastDates(today));
 		}
 		else if (date < startDate || date > endDate) {
-				setDates(getMonthDates(date));
-			}
+			setDates(getMonthDates(date));
+		}
 		
 		setSelectedDate(date);
-
-		// selectDate에 해당하는 feeds 받아오기
-		setFeeds(dummyfeed[1]);
-
+		loadFeeds(date);
 		setCalendarVisible(false);
+	};
+
+	const onGotoToday = () => {
+		setDates(getLastDates(today));
+		setSelectedDate(today);
+		loadFeeds(today);
 	};
 
 	return (
@@ -169,6 +176,9 @@ const Feed = () => {
 					{selectedDate.getFullYear()}. {selectedDate.getMonth() + 1}. {selectedDate.getDate()}. ▾
 				</SelectedDateText>
 			</SelectedDate>
+			<TodayButton onPress={onGotoToday}>
+				<Icon source={require('../assets/today-icon.png')} />
+			</TodayButton>
 		</SelectedDateContainer>
 
 		<CalendarModal
@@ -238,7 +248,10 @@ const DateText = styled.Text`
 `;
 
 const SelectedDateContainer = styled.View`
-	padding: ${w16}px ${w28}px ${w28}px;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: ${w16}px ${w64}px ${w28}px ${w28}px;
 	border-bottom-width: 1px;
 	border-bottom-color: ${({ theme }) => theme.gray};
 `;
@@ -248,6 +261,15 @@ const SelectedDate = styled.TouchableOpacity``;
 const SelectedDateText = styled.Text`
 	font-size: ${w108}px;
 	font-weight: 600;
+`;
+
+const TodayButton = styled.TouchableOpacity`
+	width: ${w96}px;
+	height: ${w96}px;
+	background-color: ${({ theme }) => theme.secondaryBackground};
+	border-radius: ${w16}px;
+	margin-top: ${w16}px;
+	padding: ${w8}px;
 `;
 
 const CalendarModalContainer = styled.Modal``;

@@ -7,6 +7,7 @@ import { Context } from '../utils/Context';
 import { w16, w24, w28, w32, w48, w64, w96 } from '../utils/theme';
 import Container from '../components/Container';
 import Header from '../components/Header';
+import Icon from '../components/Icon';
 
 const ChatBot = () => {
 	const [messages, setMessages] = useState([]);
@@ -169,11 +170,6 @@ const Button = styled.TouchableOpacity`
 	height: ${w96}px;
 	margin-left: ${w16}px;
 	padding: ${w16}px;
-`;
-
-const Icon = styled.Image`
-	width: 100%;
-	height: 100%;
 `;
 
 export default ChatBot;
