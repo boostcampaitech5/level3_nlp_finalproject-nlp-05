@@ -8,13 +8,7 @@ import TabNavigator from '../components/TabNavigator';
 const Stack = createNativeStackNavigator();
 
 const Main = () => {
-	const { isLogin, setIsLogin, loginComplete, setLoginComplete } = useContext(Context);
-
-	useEffect(() => {
-		// login 상태 확인 후 login 시 isLogin true, isLoading false
-		// login 아닐 시 isLogin false, isLoading 1초 후 false
-		// setLoginComplete(true);
-	}, []);
+	const { isLogin } = useContext(Context);
 
 	return (
 		<>

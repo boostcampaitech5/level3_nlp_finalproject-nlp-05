@@ -1,10 +1,13 @@
 import React, { useEffect } from 'react';
 import * as Font from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 import { RootSiblingParent } from 'react-native-root-siblings';
 import { ContextProvider } from './utils/Context';
 import { ThemeProvider } from 'styled-components/native';
 import { getTheme } from './utils/theme';
 import Main from './screens/Main'
+
+SplashScreen.preventAutoHideAsync();
 
 const theme = getTheme();
 
