@@ -35,7 +35,7 @@ def inference(CFG):
     
     test_data = load_data(CFG['TEST_PATH'])
     
-    tokenized_test, tokenized_test_labels = tokenized_dataset(test_data, tokenizer, CFG['MAX_LENGTH'])
+    tokenized_test, tokenized_test_labels = tokenized_dataset(test_data, tokenizer, CFG['MAX_LENGTH'], add_eos=True)
 
     test_dataset = Dataset(tokenized_test, tokenized_test_labels)
     data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer)
@@ -44,18 +44,38 @@ def inference(CFG):
     predictions = []
     labels = []
     decoded_predictions = []
+    perplexities = []
     
     for test_features in tqdm(test_dataloader, total=len(test_dataloader)):
         test_features.to(device)
         inference_output = model.generate(
                 test_features['input_ids'],
                 max_length=256,
+                output_scores=True,
+                return_dict_in_generate=True
             )
         
-        predictions += np.array(inference_output.detach().cpu()).tolist()
+        eos_value = torch.tensor([1 for _ in range(len(test_features['input_ids']))]) # batch size
+        probs = torch.tensor([[1.0, 0.0] for _ in range(len(test_features['input_ids']))]) # batch size, 2
+        
+        for i in range(len(inference_output.scores)):
+            prob = torch.softmax(inference_output.scores[i].detach().cpu(), dim=-1) # batch size, vocab size
+            prob, index = torch.max(prob, dim=-1) # batch size
+            
+            prob[eos_value == 0] = 1.0
+            probs[:, 0] = probs[:, 0] * prob
+            probs[:, 1] = probs[:, 1] + eos_value
+            
+            mask = index == tokenizer.eos_token_id
+            eos_value[mask] = 0
+
+        perplexity = ((1 / probs[:, 0]) ** (1 / probs[:, 1])).mean()
+        perplexities.append(perplexity.item())
+        
+        predictions += np.array(inference_output.sequences.detach().cpu()).tolist()
         labels += np.array(test_features['labels'].detach().cpu()).tolist()
 
-        decoded_prediction = tokenizer.batch_decode(inference_output, skip_special_tokens=True)
+        decoded_prediction = tokenizer.batch_decode(inference_output.sequences, skip_special_tokens=True)
         decoded_predictions += decoded_prediction
         
     pred_max_length = max(len(row) for row in predictions)
@@ -65,6 +85,7 @@ def inference(CFG):
     labels = np.array([row + [tokenizer.pad_token_id] * (label_max_length - len(row)) for row in labels])
 
     metric = evaluation.compute_metrics((predictions, labels))
+    metric['perplexity'] = sum(perplexities) / len(perplexities)
     
     wandb.log(metric)
     output = pd.read_csv(CFG['TEST_PATH'])

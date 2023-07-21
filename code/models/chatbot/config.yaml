@@ -1,11 +1,11 @@
 # PATH
 TRAIN_PATH: '/opt/ml/data/gpt_chat_data/seq2seq_train/gpt_chat_train.csv' # '/opt/ml/data/concat_data/decoder_train/nomulti_concat_train.csv' #'/opt/ml/data/gpt_chat_data/gpt_train_data.csv'
 DEV_PATH: '/opt/ml/data/gpt_chat_data/seq2seq_validation/gpt_chat_valid.csv'
-TEST_PATH: '/opt/ml/data/gpt_chat_data/seq2seq_validation/gpt_valid_data.csv'
-MODEL_SAVE_DIR: '/opt/ml/ignore_folder/bart_gpt'
+TEST_PATH: '/opt/ml/data/gpt_chat_data/seq2seq_validation/gpt_chat_valid.csv'
+MODEL_SAVE_DIR: '/opt/ml/KULLM/yeah'
 
 # MODEL (확인 필수)
-MODEL_NAME: 'gogamza/kobart-base-v2' # 'paust/pko-t5-large'  # 'byeongal/Ko-DialoGPT' # 'skt/kogpt2-base-v2' # 'gogamza/kobart-base-v2'
+MODEL_NAME: 'nlpai-lab/kullm-polyglot-5.8b-v2' # 'paust/pko-t5-large'  # 'byeongal/Ko-DialoGPT' # 'skt/kogpt2-base-v2' # 'gogamza/kobart-base-v2'
 
 # HYPER PARAMETER (확인 필수)
 MAX_EPOCH: 3

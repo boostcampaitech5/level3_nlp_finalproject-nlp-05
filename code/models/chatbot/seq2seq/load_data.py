@@ -36,7 +36,7 @@ def tokenized_dataset(data, tokenizer, max_length, add_eos=True):
             
             if add_eos:
                 if tokenized_text['input_ids'][i][-1] != tokenizer.eos_token_id:
-                    tokenized_labels['input_ids'][i].append(tokenizer.eos_token_id)
+                    tokenized_text['input_ids'][i].append(tokenizer.eos_token_id)
             
     with tqdm(total=len(data), desc="Tokenizing Labels", unit="text") as pbar:
         with tokenizer.as_target_tokenizer():
