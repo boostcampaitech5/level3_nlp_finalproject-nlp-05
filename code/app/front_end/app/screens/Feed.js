@@ -132,8 +132,7 @@ const Feed = () => {
 		// date에 해당하는 feeds 받아오기
 		try {
 			setFeeds(dummyfeed[1]);
-		}
-		catch (error) {
+		} catch (error) {
 			toast('서버 접속이 원활하지 않습니다.')
 		}
 	}

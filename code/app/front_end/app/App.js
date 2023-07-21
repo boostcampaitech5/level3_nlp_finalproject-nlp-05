@@ -1,33 +1,25 @@
-import React, { useEffect } from 'react';
-import * as Font from 'expo-font';
+import React from 'react';
+import * as SplashScreen from 'expo-splash-screen';
 import { RootSiblingParent } from 'react-native-root-siblings';
 import { ContextProvider } from './utils/Context';
 import { ThemeProvider } from 'styled-components/native';
 import { getTheme } from './utils/theme';
-import Main from './screens/Main'
+import Main from './screens/Main';
+import Loading from './screens/Loading';
+
+SplashScreen.preventAutoHideAsync();
 
 const theme = getTheme();
 
-const loadFonts = async () => {
-	await Font.loadAsync({
-		'HandWriting': require('./assets/fonts/nanum_handwriting.ttf')
-	});
-};
-
-const App = () => {
-	useEffect(() => {
-		loadFonts();
-	}, []);
-
-	return (
-		<ThemeProvider theme={theme}>
-			<ContextProvider>
-				<RootSiblingParent>
-					<Main />
-				</RootSiblingParent>
-			</ContextProvider>
-		</ThemeProvider>
-	);
-};
+const App = () => (
+	<ThemeProvider theme={theme}>
+		<ContextProvider>
+			<RootSiblingParent>
+				<Loading />
+				<Main />
+			</RootSiblingParent>
+		</ContextProvider>
+	</ThemeProvider>
+);
 
 export default App;
