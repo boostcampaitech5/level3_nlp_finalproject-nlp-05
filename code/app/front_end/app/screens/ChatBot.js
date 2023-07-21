@@ -4,7 +4,7 @@ import styled from 'styled-components/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import { Context } from '../utils/Context';
-import { w16, w24, w28, w32, w48, w64, w96 } from '../utils/theme';
+import { w8, w16, w24, w28, w32, w48, w64, w96 } from '../utils/theme';
 import Container from '../components/Container';
 import Header from '../components/Header';
 import Icon from '../components/Icon';
@@ -13,7 +13,11 @@ const ChatBot = () => {
 	const [messages, setMessages] = useState([]);
 	const [inputText, setInputText] = useState('');
 	const scrollViewRef = useRef(null);
-	const { userId, setUserId } = useContext(Context);
+	const { userId } = useContext(Context);
+
+	useEffect(() => {
+		loadChatLog();
+	}, []);
 
 	useEffect(() => {
 		scrollToBottom();
@@ -25,9 +29,25 @@ const ChatBot = () => {
 		}
 	};
 
+	const loadChatLog = async () => {
+		const res = await axios.get(`http://ec2-43-201-149-19.ap-northeast-2.compute.amazonaws.com/api/user/chat-messages/?user_id=${userId}`,
+		{},
+		{
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			}
+		});
+		// console.log(res.data)
+	}
+
 	const handleSend = async () => {
 		try {
-			const message = { id: Date.now(), text: inputText, sender: 'user' };
+			const message = {
+				id: Date.now(),
+				message: inputText,
+				sender: 'user',
+				created_at: new Date()
+			};
 			setMessages((prevMessages) => [...prevMessages, message]);
 			setInputText('');
 			
@@ -40,9 +60,14 @@ const ChatBot = () => {
 				}
 			});
 
-			res_message = { id: Date.now(), text: res.data.chatbot_message, sender: 'bot' };
+			res_message = {
+				id: Date.now(),
+				message: res.data.chatbot_message,
+				sender: 'bot',
+				created_at: new Date()
+			};
 			setMessages((prevMessages) => [...prevMessages, res_message]);
-
+			
 		} catch (error) {
 			console.error(error);
 		}
@@ -52,16 +77,22 @@ const ChatBot = () => {
 		
 	};
 
-	const handleVoice = async () => {
-
-	};
-
 	return (
 		<Container>
 			<Header view='chatbot' />
 
 			<MessagesContainer ref={scrollViewRef}>
-					{messages.map(message => (
+				{messages.map((message, idx) => (
+					<MessageContainer key={message.id}>
+						{(idx === 0
+							|| messages[idx - 1].created_at.getDate() !== message.created_at.getDate()
+							) && (
+							<DateSeparator>
+								<DateSeparatorText>
+									{message.created_at.getFullYear()}년 {message.created_at.getMonth()}월 {message.created_at.getDate()}일
+								</DateSeparatorText>
+							</DateSeparator>
+						)}
 						<MessageContent key={message.id} sender={message.sender}>
 							{message.sender === 'bot' && (
 								<BotProfile>
@@ -69,41 +100,58 @@ const ChatBot = () => {
 								</BotProfile>
 							)}
 							<Message key={message.id} sender={message.sender}>
-								<MessageText>{message.text}</MessageText>
+								<MessageText>{message.message}</MessageText>
 							</Message>
 						</MessageContent>
-					))}
+					</MessageContainer>
+					
+				))}
 			</MessagesContainer>
 
 			<InputContainer>
-					<Input
-						value={inputText}
-						multiline={true}
-						onChangeText={setInputText}
-					/>
-					{inputText ? (
-						<Button onPress={handleSend}>
-							<Icon source={require('../assets/send-icon.png')} />
-						</Button>
-						) : (
-						<>
-							<Button onPress={handleImage}>
-								<Icon source={require('../assets/image-icon.png')} />
-							</Button>
-							<Button onPress={handleVoice}>
-								<Icon source={require('../assets/mic-icon.png')} />
-							</Button>
-						</>
-					)}
+				<Input
+					value={inputText}
+					multiline={true}
+					onChangeText={setInputText}
+				/>
+				{inputText ? (
+					<Button onPress={handleSend}>
+						<Icon source={require('../assets/send-icon.png')} />
+					</Button>
+					) : (
+					<Button onPress={handleImage}>
+						<Icon source={require('../assets/image-icon.png')} />
+					</Button>
+				)}
 			</InputContainer>
 		</Container>
 	);
 };
 
+const Test = styled.Text``
+
 const MessagesContainer = styled.ScrollView`
 	flex: 1;
 	padding: ${w28}px ${w28}px ${w64}px;
 `;
+
+const MessageContainer = styled.View`
+	flex: 1;
+`
+
+const DateSeparator = styled.View`
+	flex: 1;
+	flex-direction: row;
+	justify-content: center;
+`
+
+const DateSeparatorText = styled.Text`
+	padding: ${w8}px ${w64}px;
+	border-radius: 100px;
+	background-color: ${({ theme }) => theme.primaryBackground}80;
+	color: ${({ theme }) => theme.background};
+`
+
 
 const MessageContent = styled.View`
 	flex: 1;

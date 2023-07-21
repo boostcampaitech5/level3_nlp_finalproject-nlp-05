@@ -281,14 +281,13 @@ const SelectedDate = styled.TouchableOpacity``;
 
 const SelectedDateText = styled.Text`
 	font-size: ${w108}px;
-	font-weight: 600;
 `;
 
 const TodayButton = styled.TouchableOpacity`
 	width: ${w96}px;
 	height: ${w96}px;
 	background-color: ${({ theme }) => theme.secondaryBackground};
-	border-radius: ${w16}px;
+	border-radius: ${w32}px;
 	margin-top: ${w16}px;
 	padding: ${w8}px;
 `;
