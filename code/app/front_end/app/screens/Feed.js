@@ -7,6 +7,7 @@ import { SCREEN_WIDTH, w8, w14, w16, w28, w32, w48, w64, w84, w96, w108, w144 } 
 import Container from '../components/Container';
 import Header from '../components/Header';
 import Icon from '../components/Icon';
+import { toast } from '../utils/toast';
 
 const getLastDates = today => {
 	const date = new Date(today);
@@ -129,7 +130,12 @@ const Feed = () => {
 
 	const loadFeeds = date => {
 		// date에 해당하는 feeds 받아오기
-		setFeeds(dummyfeed[1]);
+		try {
+			setFeeds(dummyfeed[1]);
+		}
+		catch (error) {
+			toast('서버 접속이 원활하지 않습니다.')
+		}
 	}
 
 	const onSelectDate = date => {
@@ -281,14 +287,13 @@ const SelectedDate = styled.TouchableOpacity``;
 
 const SelectedDateText = styled.Text`
 	font-size: ${w108}px;
-	font-weight: 600;
 `;
 
 const TodayButton = styled.TouchableOpacity`
 	width: ${w96}px;
 	height: ${w96}px;
 	background-color: ${({ theme }) => theme.secondaryBackground};
-	border-radius: ${w16}px;
+	border-radius: ${w32}px;
 	margin-top: ${w16}px;
 	padding: ${w8}px;
 `;

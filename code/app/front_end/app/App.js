@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
+import * as Font from 'expo-font';
+import { RootSiblingParent } from 'react-native-root-siblings';
 import { ContextProvider } from './utils/Context';
-import Main from './screens/Main'
 import { ThemeProvider } from 'styled-components/native';
 import { getTheme } from './utils/theme';
-import * as Font from 'expo-font';
+import Main from './screens/Main'
 
 const theme = getTheme();
 
@@ -21,7 +22,9 @@ const App = () => {
 	return (
 		<ThemeProvider theme={theme}>
 			<ContextProvider>
-				<Main />
+				<RootSiblingParent>
+					<Main />
+				</RootSiblingParent>
 			</ContextProvider>
 		</ThemeProvider>
 	);
