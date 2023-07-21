@@ -71,7 +71,8 @@ const ChatBot = () => {
 			setMessages((prevMessages) => [...prevMessages, res_message]);
 
 		} catch (error) {
-			toast('서버 접속이 원활하지 않습니다.')
+			toast('서버 접속이 원활하지 않습니다.');
+			console.log(error);
 		}
 	};
 

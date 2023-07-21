@@ -29,16 +29,14 @@ const Loading = () => {
 					setUserId(newUserId);
 				}
 
+				setIsLogin(true);
+
+				// hide splash screen
+				await SplashScreen.hideAsync();
+
 			} catch (error) {
 				toast('로그인에 실패했습니다.');
-
-			} finally {
-				setTimeout(async () => {
-					setIsLogin(true);
-
-					// hide splash screen
-					await SplashScreen.hideAsync();
-				}, 1000);
+				console.log(error);
 			}
 		};
 		

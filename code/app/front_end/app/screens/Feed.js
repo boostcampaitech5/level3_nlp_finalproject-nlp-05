@@ -133,7 +133,8 @@ const Feed = () => {
 		try {
 			setFeeds(dummyfeed[1]);
 		} catch (error) {
-			toast('서버 접속이 원활하지 않습니다.')
+			toast('서버 접속이 원활하지 않습니다.');
+			console.log(error);
 		}
 	}
 
