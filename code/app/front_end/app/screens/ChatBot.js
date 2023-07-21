@@ -8,10 +8,12 @@ import { w8, w16, w24, w28, w32, w48, w64, w96 } from '../utils/theme';
 import Container from '../components/Container';
 import Header from '../components/Header';
 import Icon from '../components/Icon';
+import { toast } from '../utils/toast';
 
 const ChatBot = () => {
 	const [messages, setMessages] = useState([]);
 	const [inputText, setInputText] = useState('');
+	const [toastVisible, setToastVisible] = useState(false);
 	const scrollViewRef = useRef(null);
 	const { userId } = useContext(Context);
 
@@ -67,9 +69,9 @@ const ChatBot = () => {
 				created_at: new Date()
 			};
 			setMessages((prevMessages) => [...prevMessages, res_message]);
-			
+
 		} catch (error) {
-			console.error(error);
+			toast('서버 접속이 원활하지 않습니다.')
 		}
 	};
 
