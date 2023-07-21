@@ -1,40 +1,70 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ScrollView } from 'react-native';
-import styled from 'styled-components/native';
+import styled, { useTheme } from 'styled-components/native';
+import CalendarPicker from 'react-native-calendar-picker';
 import axios from 'axios';
-import { w8, w14, w16, w28, w32, w48, w64, w84, w96, w108, w144 } from '../utils/theme';
+import { SCREEN_WIDTH, w8, w14, w16, w28, w32, w48, w64, w84, w96, w108, w144 } from '../utils/theme';
 import Container from '../components/Container';
 import Header from '../components/Header';
+import Icon from '../components/Icon';
 
 const getLastDates = today => {
 	const date = new Date(today);
 	date.setMonth(date.getMonth() - 1);
 	date.setDate(date.getDate() + 1);
 
-	const dates = [];
+	const lastDates = [];
 	for (; date <= today; date.setDate(date.getDate() + 1)) {
-		dates.push(new Date(date));
+		lastDates.push(new Date(date));
 	}
 
-	return dates;
+	return lastDates;
 };
 
 const getMonthDates = selectedDate => {
 	const date = new Date(selectedDate);
 	date.setDate(1);
 
-	const dates = [];
-	for (; date.getMonth() < selectedDate.getMonth(); date.setDate(date.getDate() + 1)) {
-		dates.push(new Date(date));
+	const monthDates = [];
+	for (; date.getMonth() === selectedDate.getMonth(); date.setDate(date.getDate() + 1)) {
+		monthDates.push(new Date(date));
 	}
 
-	return dates;
+	return monthDates;
 };
 
 const dayToKorean = date => {
 	const korean = ['일', '월', '화', '수', '목', '금', '토'];
 
 	return korean[date.getDay()];
+};
+
+const CalendarModal = ({ visible, onSelectCalendar, onClose, today, selectedDate }) => {
+	const theme = useTheme();
+
+	return (
+		<CalendarModalContainer visible={visible} transparent animationType="fade">
+			<CalendarModalBackground activeOpacity={1} onPress={onClose}>
+				<CalendarContainer>
+					<CalendarPicker
+						onDateChange={onSelectCalendar}
+						weekdays={['월', '화', '수', '목', '금', '토', '일']}
+						months={['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']}
+						maxDate={today}
+						width={SCREEN_WIDTH * 0.9}
+						previousTitle='◀'
+						nextTitle='▶'
+						selectMonthTitle='월 선택: '
+						selectYearTitle='연 선택'
+						initialDate={selectedDate}
+						selectedStartDate={selectedDate}
+						selectedDayColor={theme.secondary}
+						selectedDayTextColor={theme.background}
+					/>
+				</CalendarContainer>
+			</CalendarModalBackground>
+		</CalendarModalContainer>
+	);
 };
 
 const dummyfeed = [
@@ -47,8 +77,8 @@ const dummyfeed = [
 			time: '11:32',
 			text: '배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. '
 		}
-		],
-		[
+	],
+	[
 		{
 			time: '12:34',
 			text: '오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다.'
@@ -63,21 +93,33 @@ const dummyfeed = [
 const Feed = () => {
 	const [today, setToday] = useState(new Date());
 	const [selectedDate, setSelectedDate] = useState(today);
-
 	const [dates, setDates] = useState(getLastDates(today));
-	const [monthFeeds, setMonthFeeds] = useState([]);
 	const [feeds, setFeeds] = useState([]);
+	const [calendarVisible, setCalendarVisible] = useState(false);
+	const [datesScrollOffset, setDatesScrollOffset] = useState(0);
 
 	const datesScrollRef = useRef(null);
 
 	useEffect(() => {
 		datesScrollToRight();
-
-		// dates에 해당하는 monthFeeds 받아오기
-		setMonthFeeds(dummyfeed);
 		// selectedDate에 해당하는 feeds 받아오기
 		setFeeds(dummyfeed[0]);
 	}, []);
+
+	useEffect(() => {
+		const selectedIndex = dates.findIndex(date => date.getDate() === selectedDate.getDate());
+		const selectedX = selectedIndex * (w108 + w28) + w64;
+
+		const startIndex = datesScrollOffset + w64;
+		const endIndex = datesScrollOffset + w64 + 6 * (w108 + w28);
+
+		if (selectedX < startIndex) {
+			datesScrollRef.current.scrollTo({ x: selectedX - w64, y: 0, animated: true });
+		}
+		else if (selectedX > endIndex) {
+			datesScrollRef.current.scrollTo({ x: selectedX - 6 * (w108 + w28) - w64, y: 0, animated: true });
+		}
+	}, [selectedDate]);
 
 	const datesScrollToRight = () => {
 		if (datesScrollRef.current) {
@@ -85,34 +127,58 @@ const Feed = () => {
 		}
 	};
 
-	const getMonthFeed = () => {
-		// state update 순서 주의. calendar를 통해 진입 시 인자 올바르게 넣을 것
-		setMonthFeeds(dummyfeed)
+	const loadFeeds = date => {
+		// date에 해당하는 feeds 받아오기
+		setFeeds(dummyfeed[1]);
 	}
 
-	const handleSelectDate = date => {
-		setSelectedDate(date)
+	const onSelectDate = date => {
+		setSelectedDate(date);
+		loadFeeds(date);
+	};
 
-		// selectDate에 해당하는 feeds 받아오기
-		setFeeds(monthFeeds[1]);
-	}
+	const onSelectCalendar = selectedCalendarDate => {
+		let date = new Date(selectedCalendarDate);
+		
+		const startDate = new Date(dates[0].getFullYear(), dates[0].getMonth(), dates[0].getDate());
+		const endDate = new Date(dates[dates.length - 1].getFullYear(), dates[dates.length - 1].getMonth(), dates[dates.length - 1].getDate());
+		date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+		
+		if (date.getMonth() === today.getMonth()) {
+			setDates(getLastDates(today));
+		}
+		else if (date < startDate || date > endDate) {
+			setDates(getMonthDates(date));
+		}
+		
+		loadFeeds(date);
+		setCalendarVisible(false);
+		setSelectedDate(date);
+	};
 
-	const handleCalendar = date => {
-
-	}
+	const onGotoToday = () => {
+		setDates(getLastDates(today));
+		setSelectedDate(today);
+		loadFeeds(today);
+	};
 
 	return (
 	<Container>
 		<Header view='feed' />
 
 		<DatesScrollContainer>
-			<DatesScroll horizontal showsHorizontalScrollIndicator={false} ref={datesScrollRef}>
+			<DatesScroll
+				horizontal
+				showsHorizontalScrollIndicator={false}
+				ref={datesScrollRef}
+				onScroll={e => setDatesScrollOffset(e.nativeEvent.contentOffset.x)}
+			>
 				{dates.map((date, idx) => (
 					<DateContainer
 						key={idx}
 						date={date}
 						selectedDate={selectedDate}
-						onPress={() => handleSelectDate(date, idx)}
+						onPress={() => onSelectDate(date, idx)}
 					>
 						<DayText date={date} selectedDate={selectedDate}>
 							{dayToKorean(date)}
@@ -126,12 +192,23 @@ const Feed = () => {
 		</DatesScrollContainer>
 
 		<SelectedDateContainer>
-			<SelectedDate onPress={handleCalendar}>
+			<SelectedDate onPress={() => setCalendarVisible(true)}>
 				<SelectedDateText>
-					{selectedDate.getFullYear()}. {selectedDate.getMonth() + 1}. {selectedDate.getDate()}.
+					{selectedDate.getFullYear()}. {selectedDate.getMonth() + 1}. {selectedDate.getDate()}. ▾
 				</SelectedDateText>
 			</SelectedDate>
+			<TodayButton onPress={onGotoToday}>
+				<Icon source={require('../assets/today-icon.png')} />
+			</TodayButton>
 		</SelectedDateContainer>
+
+		<CalendarModal
+			visible={calendarVisible}
+			onSelectCalendar={onSelectCalendar}
+			onClose={() => setCalendarVisible(false)}
+			today={today}
+			selectedDate={selectedDate}
+		/>
 
 		<FeedsScroll>
 			{feeds && feeds.map((feed, idx) => (
@@ -192,7 +269,10 @@ const DateText = styled.Text`
 `;
 
 const SelectedDateContainer = styled.View`
-	padding: ${w16}px ${w28}px ${w28}px;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: ${w16}px ${w64}px ${w28}px ${w28}px;
 	border-bottom-width: 1px;
 	border-bottom-color: ${({ theme }) => theme.gray};
 `;
@@ -202,6 +282,31 @@ const SelectedDate = styled.TouchableOpacity``;
 const SelectedDateText = styled.Text`
 	font-size: ${w108}px;
 	font-weight: 600;
+`;
+
+const TodayButton = styled.TouchableOpacity`
+	width: ${w96}px;
+	height: ${w96}px;
+	background-color: ${({ theme }) => theme.secondaryBackground};
+	border-radius: ${w16}px;
+	margin-top: ${w16}px;
+	padding: ${w8}px;
+`;
+
+const CalendarModalContainer = styled.Modal``;
+
+const CalendarModalBackground = styled.TouchableOpacity`
+	flex: 1;
+	justify-content: center;
+	background-color: rgba(0, 0, 0, 0.5);
+`;
+
+const CalendarContainer = styled.View`
+	margin: 16px;
+	background-color: ${({ theme }) => theme.background};
+	border-radius: 16px;
+	padding: 16px;
+	height: 42%;
 `;
 
 const FeedsScroll = styled.ScrollView`
