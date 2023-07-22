@@ -4,16 +4,18 @@ import styled from 'styled-components/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import { Context } from '../utils/Context';
-import { w8, w16, w24, w28, w32, w48, w64, w96 } from '../utils/theme';
+import { w8, w16, w24, w28, w32, w48, w64, w96, w108 } from '../utils/theme';
 import Container from '../components/Container';
 import Header from '../components/Header';
 import Icon from '../components/Icon';
 import { toast } from '../utils/toast';
 
+const FIRSTCHAT = '안녕하세요! 무슨 일이 있었나요?';
+
 const ChatBot = () => {
 	const [messages, setMessages] = useState([]);
 	const [inputText, setInputText] = useState('');
-	const [toastVisible, setToastVisible] = useState(false);
+	const [isChatting, setIsChatting] = useState(false);
 	const scrollViewRef = useRef(null);
 	const { userId } = useContext(Context);
 
@@ -87,9 +89,7 @@ const ChatBot = () => {
 			<MessagesContainer ref={scrollViewRef}>
 				{messages.map((message, idx) => (
 					<MessageContainer key={message.id}>
-						{(idx === 0
-							|| messages[idx - 1].created_at.getDate() !== message.created_at.getDate()
-							) && (
+						{(message.sender === 'bot' && message.message === FIRSTCHAT) && (
 							<DateSeparator>
 								<DateSeparatorText>
 									{message.created_at.getFullYear()}년 {message.created_at.getMonth()}월 {message.created_at.getDate()}일
@@ -107,9 +107,15 @@ const ChatBot = () => {
 							</Message>
 						</MessageContent>
 					</MessageContainer>
-					
 				))}
 			</MessagesContainer>
+
+			{!isChatting && 
+			<StartButtonContainer>
+				<StartButton>
+					<StartButtonText>대화 시작하기</StartButtonText>
+				</StartButton>
+			</StartButtonContainer>}
 
 			<InputContainer>
 				<Input
@@ -131,8 +137,6 @@ const ChatBot = () => {
 	);
 };
 
-const Test = styled.Text``
-
 const MessagesContainer = styled.ScrollView`
 	flex: 1;
 	padding: ${w28}px ${w28}px ${w64}px;
@@ -153,8 +157,8 @@ const DateSeparatorText = styled.Text`
 	border-radius: 100px;
 	background-color: ${({ theme }) => theme.primaryBackground}80;
 	color: ${({ theme }) => theme.background};
+	font-family: Light;
 `
-
 
 const MessageContent = styled.View`
 	flex: 1;
@@ -189,6 +193,25 @@ const Message = styled.View`
 const MessageText = styled.Text`
 	color: white;
 	font-size: 16px;
+	font-family: Light;
+`;
+
+const StartButtonContainer = styled.View`
+	align-items: center;
+`
+
+const StartButton = styled.TouchableOpacity`
+	position: absolute;
+	bottom: ${w64}px;
+	background-color: ${({ theme }) => theme.secondaryBackground}F0;
+	border-radius: 100px;
+	padding: ${w32}px ${w108 * 2}px;
+`;
+
+const StartButtonText = styled.Text`
+	font-size: 16px;
+	color: ${({ theme }) => theme.background};
+	font-family: Light;
 `;
 
 const InputContainer = styled(LinearGradient).attrs(({ theme }) => ({
@@ -214,6 +237,7 @@ const Input = styled(TextInput).attrs(({ theme }) => ({
 	border-radius: 20px;
 	padding: ${w16}px ${w48}px;
 	font-size: 16px;
+	font-family: Regular;
 `;
 
 const Button = styled.TouchableOpacity`

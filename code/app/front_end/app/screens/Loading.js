@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 import * as Font from 'expo-font';
 import { Context } from '../utils/Context';
 import * as SecureStore from 'expo-secure-store';
@@ -13,6 +13,9 @@ const Loading = () => {
 			try {
 				// load font
 				await Font.loadAsync({
+					'Light': require('../assets/fonts/NanumSquareNeo-aLt.ttf'),
+					'Regular': require('../assets/fonts/NanumSquareNeo-bRg.ttf'),
+					'Bold': require('../assets/fonts/NanumSquareNeo-cBd.ttf'),
 					'HandWriting': require('../assets/fonts/nanum_handwriting.ttf')
 				});
 

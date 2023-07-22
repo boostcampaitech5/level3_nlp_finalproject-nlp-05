@@ -53,6 +53,7 @@ const CalendarModal = ({ visible, onSelectCalendar, onClose, today, selectedDate
 						months={['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']}
 						maxDate={today}
 						width={SCREEN_WIDTH * 0.9}
+						textStyle={{ fontFamily: 'Light' }}
 						previousTitle='◀'
 						nextTitle='▶'
 						selectMonthTitle='월 선택: '
@@ -247,11 +248,12 @@ const DatesScroll = styled(ScrollView).attrs({
 
 const DateContainer = styled.TouchableOpacity`
 	flex: 1;
+	justify-content: space-between;
 	align-items: center;
 	width: ${w108}px;
 	height: ${w144}px;
 	margin: ${w16}px ${w14}px;
-	padding-top: ${w8}px;
+	padding: ${w16}px 0;
 	border-radius: ${w48}px;
 
 	background-color: ${({ date, selectedDate, theme }) => 
@@ -261,6 +263,7 @@ const DateContainer = styled.TouchableOpacity`
 
 const DayText = styled.Text`
 	font-size: 11px;
+	font-family: Light;
 	color: ${({ date, selectedDate, theme }) => 
 		date.getDate() === selectedDate.getDate() ? theme.background : 'black'
 	};
@@ -268,7 +271,7 @@ const DayText = styled.Text`
 
 const DateText = styled.Text`
 	font-size: 21px;
-	font-weight: 600;
+	font-family: Regular;
 	color: ${({ date, selectedDate, theme }) => 
 		date.getDate() === selectedDate.getDate() ? theme.background : 'black'
 	};
@@ -283,10 +286,13 @@ const SelectedDateContainer = styled.View`
 	border-bottom-color: ${({ theme }) => theme.gray};
 `;
 
-const SelectedDate = styled.TouchableOpacity``;
+const SelectedDate = styled.TouchableOpacity`
+`;
 
 const SelectedDateText = styled.Text`
-	font-size: ${w108}px;
+	font-size: ${w96}px;
+	font-family: Regular;
+	line-height: ${w108 + w16}px;
 `;
 
 const TodayButton = styled.TouchableOpacity`
@@ -316,6 +322,7 @@ const CalendarContainer = styled.View`
 
 const FeedsScroll = styled.ScrollView`
 	flex: 1;
+	padding-top: ${w32}px;
 `;
 
 const FeedContainer = styled.View`
@@ -324,14 +331,14 @@ const FeedContainer = styled.View`
 `;
 
 const FeedTime = styled.Text`
-	padding-left: ${w64}px;
-	padding-bottom: ${w28}px;
-	font-size: ${w96}px;
-	font-family: HandWriting;
+	padding-left: ${w48}px;
+	padding-bottom: ${w8}px;
+	font-size: ${w84}px;
+	font-family: Light;
 `;
 
 const FeedText = styled.Text`
-	padding: 0 ${w84}px;
+	padding: 0 ${w96}px;
 	font-size: 18px;
 	font-family: HandWriting;
 `;

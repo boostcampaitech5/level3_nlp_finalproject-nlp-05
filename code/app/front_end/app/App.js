@@ -5,7 +5,6 @@ import { ContextProvider } from './utils/Context';
 import { ThemeProvider } from 'styled-components/native';
 import { getTheme } from './utils/theme';
 import Main from './screens/Main';
-import Loading from './screens/Loading';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,7 +14,6 @@ const App = () => (
 	<ThemeProvider theme={theme}>
 		<ContextProvider>
 			<RootSiblingParent>
-				<Loading />
 				<Main />
 			</RootSiblingParent>
 		</ContextProvider>
