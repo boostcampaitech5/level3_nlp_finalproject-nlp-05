@@ -9,13 +9,13 @@ import Header from '../components/Header';
 import Icon from '../components/Icon';
 import { toast } from '../utils/toast';
 
-const getLastDates = today => {
-	const date = new Date(today);
+const getLastDates = yesterday => {
+	const date = new Date(yesterday);
 	date.setMonth(date.getMonth() - 1);
 	date.setDate(date.getDate() + 1);
 
 	const lastDates = [];
-	for (; date <= today; date.setDate(date.getDate() + 1)) {
+	for (; date <= yesterday; date.setDate(date.getDate() + 1)) {
 		lastDates.push(new Date(date));
 	}
 
@@ -40,7 +40,7 @@ const dayToKorean = date => {
 	return korean[date.getDay()];
 };
 
-const CalendarModal = ({ visible, onSelectCalendar, onClose, today, selectedDate }) => {
+const CalendarModal = ({ visible, onSelectCalendar, onClose, yesterday, selectedDate }) => {
 	const theme = useTheme();
 
 	return (
@@ -51,8 +51,9 @@ const CalendarModal = ({ visible, onSelectCalendar, onClose, today, selectedDate
 						onDateChange={onSelectCalendar}
 						weekdays={['월', '화', '수', '목', '금', '토', '일']}
 						months={['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']}
-						maxDate={today}
+						maxDate={yesterday}
 						width={SCREEN_WIDTH * 0.9}
+						textStyle={{ fontFamily: 'Light' }}
 						previousTitle='◀'
 						nextTitle='▶'
 						selectMonthTitle='월 선택: '
@@ -61,6 +62,9 @@ const CalendarModal = ({ visible, onSelectCalendar, onClose, today, selectedDate
 						selectedStartDate={selectedDate}
 						selectedDayColor={theme.secondary}
 						selectedDayTextColor={theme.background}
+						todayBackgroundColor={theme.background}
+						todayTextStyle={{ color: theme.gray }}
+						disabledDatesTextStyle={{ color: theme.gray }}
 					/>
 				</CalendarContainer>
 			</CalendarModalBackground>
@@ -71,12 +75,12 @@ const CalendarModal = ({ visible, onSelectCalendar, onClose, today, selectedDate
 const dummyfeed = [
 	[
 		{
-			time: '12:34',
-			text: '오늘은 18일이다. 오늘은 18일이다. \n오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다. 오늘은 18일이다.'
+			time: '06:31',
+			text: '이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n'
 		},
 		{
-			time: '11:32',
-			text: '배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. '
+			time: '06:32',
+			text: '이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n'
 		}
 	],
 	[
@@ -92,14 +96,19 @@ const dummyfeed = [
 ];
 
 const Feed = () => {
-	const [today, setToday] = useState(new Date());
-	const [selectedDate, setSelectedDate] = useState(today);
-	const [dates, setDates] = useState(getLastDates(today));
+	const [yesterday, setYesterday] = useState(() => {
+		const yesterday = new Date();
+		yesterday.setDate(yesterday.getDate() - 1);
+		return yesterday;
+	});
+	const [selectedDate, setSelectedDate] = useState(yesterday);
+	const [dates, setDates] = useState(getLastDates(yesterday));
 	const [feeds, setFeeds] = useState([]);
 	const [calendarVisible, setCalendarVisible] = useState(false);
 	const [datesScrollOffset, setDatesScrollOffset] = useState(0);
 
 	const datesScrollRef = useRef(null);
+	const theme = useTheme();
 
 	useEffect(() => {
 		datesScrollToRight();
@@ -133,7 +142,8 @@ const Feed = () => {
 		try {
 			setFeeds(dummyfeed[1]);
 		} catch (error) {
-			toast('서버 접속이 원활하지 않습니다.')
+			toast('서버 접속이 원활하지 않습니다.');
+			console.log(error);
 		}
 	}
 
@@ -149,8 +159,8 @@ const Feed = () => {
 		const endDate = new Date(dates[dates.length - 1].getFullYear(), dates[dates.length - 1].getMonth(), dates[dates.length - 1].getDate());
 		date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 		
-		if (date.getMonth() === today.getMonth()) {
-			setDates(getLastDates(today));
+		if (date.getMonth() === yesterday.getMonth()) {
+			setDates(getLastDates(yesterday));
 		}
 		else if (date < startDate || date > endDate) {
 			setDates(getMonthDates(date));
@@ -161,10 +171,10 @@ const Feed = () => {
 		setSelectedDate(date);
 	};
 
-	const onGotoToday = () => {
-		setDates(getLastDates(today));
-		setSelectedDate(today);
-		loadFeeds(today);
+	const onGotoYesterday = () => {
+		setDates(getLastDates(yesterday));
+		setSelectedDate(yesterday);
+		loadFeeds(yesterday);
 	};
 
 	return (
@@ -202,16 +212,16 @@ const Feed = () => {
 					{selectedDate.getFullYear()}. {selectedDate.getMonth() + 1}. {selectedDate.getDate()}. ▾
 				</SelectedDateText>
 			</SelectedDate>
-			<TodayButton onPress={onGotoToday}>
+			<YesterdayButton onPress={onGotoYesterday}>
 				<Icon source={require('../assets/today-icon.png')} />
-			</TodayButton>
+			</YesterdayButton>
 		</SelectedDateContainer>
 
 		<CalendarModal
 			visible={calendarVisible}
 			onSelectCalendar={onSelectCalendar}
 			onClose={() => setCalendarVisible(false)}
-			today={today}
+			yesterday={yesterday}
 			selectedDate={selectedDate}
 		/>
 
@@ -219,7 +229,11 @@ const Feed = () => {
 			{feeds && feeds.map((feed, idx) => (
 				<FeedContainer key={idx}>
 					<FeedTime>{feed.time}</FeedTime>
-					<FeedText>{feed.text}</FeedText>
+					<FeedText
+						selectable
+						selectionColor={theme.secondaryBackground}>
+							{feed.text}
+					</FeedText>
 				</FeedContainer>
 			))}
 		</FeedsScroll>
@@ -246,11 +260,12 @@ const DatesScroll = styled(ScrollView).attrs({
 
 const DateContainer = styled.TouchableOpacity`
 	flex: 1;
+	justify-content: space-between;
 	align-items: center;
 	width: ${w108}px;
 	height: ${w144}px;
 	margin: ${w16}px ${w14}px;
-	padding-top: ${w8}px;
+	padding: ${w16}px 0;
 	border-radius: ${w48}px;
 
 	background-color: ${({ date, selectedDate, theme }) => 
@@ -260,6 +275,7 @@ const DateContainer = styled.TouchableOpacity`
 
 const DayText = styled.Text`
 	font-size: 11px;
+	font-family: Light;
 	color: ${({ date, selectedDate, theme }) => 
 		date.getDate() === selectedDate.getDate() ? theme.background : 'black'
 	};
@@ -267,7 +283,7 @@ const DayText = styled.Text`
 
 const DateText = styled.Text`
 	font-size: 21px;
-	font-weight: 600;
+	font-family: Regular;
 	color: ${({ date, selectedDate, theme }) => 
 		date.getDate() === selectedDate.getDate() ? theme.background : 'black'
 	};
@@ -282,13 +298,16 @@ const SelectedDateContainer = styled.View`
 	border-bottom-color: ${({ theme }) => theme.gray};
 `;
 
-const SelectedDate = styled.TouchableOpacity``;
-
-const SelectedDateText = styled.Text`
-	font-size: ${w108}px;
+const SelectedDate = styled.TouchableOpacity`
 `;
 
-const TodayButton = styled.TouchableOpacity`
+const SelectedDateText = styled.Text`
+	font-size: ${w96}px;
+	font-family: Regular;
+	line-height: ${w108 + w16}px;
+`;
+
+const YesterdayButton = styled.TouchableOpacity`
 	width: ${w96}px;
 	height: ${w96}px;
 	background-color: ${({ theme }) => theme.secondaryBackground};
@@ -315,6 +334,7 @@ const CalendarContainer = styled.View`
 
 const FeedsScroll = styled.ScrollView`
 	flex: 1;
+	padding-top: ${w32}px;
 `;
 
 const FeedContainer = styled.View`
@@ -323,15 +343,15 @@ const FeedContainer = styled.View`
 `;
 
 const FeedTime = styled.Text`
-	padding-left: ${w64}px;
-	padding-bottom: ${w28}px;
-	font-size: ${w96}px;
-	font-family: HandWriting;
+	padding-left: ${w48}px;
+	padding-bottom: ${w8}px;
+	font-size: ${w84}px;
+	font-family: Light;
 `;
 
 const FeedText = styled.Text`
-	padding: 0 ${w84}px;
-	font-size: 18px;
+	padding: 0 ${w96}px;
+	font-size: ${w64}px;
 	font-family: HandWriting;
 `;
 
