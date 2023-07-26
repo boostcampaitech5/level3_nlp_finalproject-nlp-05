@@ -17,12 +17,12 @@
 
 '''
 
-def processing(df):
+def preprocessing(df):
     all_input_texts = []
     labels = []
     for i in range(len(df)):
-        if df.loc[i, "summarization"] != "error":
-            check = eval(df.loc[i, "raw"])
+        if df.loc[i, "summarizations"] != "error":
+            check = eval(df.loc[i, "conversations"])
             all_input = "<s>"
 
             for line in check:
@@ -37,6 +37,6 @@ def processing(df):
             all_input += "/n###[USER]의 하루에 대해 요약해줘:</s>"
             all_input_texts.append(all_input)
 
-            labels.append(df.loc[i, 'summarization'])
+            labels.append(df.loc[i, 'summarizations'])
 
     return all_input_texts, labels
