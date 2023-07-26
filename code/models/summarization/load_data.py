@@ -62,3 +62,35 @@ def data_load(data_path, tokenizer):
     df['full_sen'] = df['sen1'] + tokenizer.sep_token + df['sen2']
     
     return df
+
+class KoBART_Dataset(torch.utils.data.Dataset):
+    def __init__(self, input_ids, labels):
+        self.input_ids = input_ids
+        self.labels = labels
+
+    def __getitem__(self, idx):
+        item = {
+            "input_ids" : self.input_ids[idx],
+            "labels" : self.labels[idx]
+        }
+
+        return item
+
+    def __len__(self):
+        return len(self.labels)
+    
+def KoBART_data_load(df, tokenizer):
+    
+    conversations_input_ids = tokenizer(
+        list(df['conversations']),
+        return_tensors='pt',
+        padding=True
+    )['input_ids']
+    
+    score = tokenizer(
+        list(df['summarizations']),
+        return_tensors='pt',
+        padding=True
+    )['input_ids']
+    
+    return conversations_input_ids, score
