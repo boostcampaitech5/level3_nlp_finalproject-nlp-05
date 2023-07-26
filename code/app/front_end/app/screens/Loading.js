@@ -21,8 +21,11 @@ const Loading = () => {
 
 				// login or signup
 				const savedUserId = await SecureStore.getItemAsync('userId');
+				
 				if (savedUserId) {
 					setUserId(savedUserId);
+					// TODO 임시로 넣은 ID, 추후 삭제
+					setUserId('test_id')
 					
 				} else {
 					// API로 불러오기
