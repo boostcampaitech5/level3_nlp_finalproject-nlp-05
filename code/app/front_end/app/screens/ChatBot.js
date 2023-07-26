@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { TextInput } from 'react-native';
 import styled, { useTheme } from 'styled-components/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { Context } from '../utils/Context';
 import { w8, w16, w24, w28, w32, w48, w64, w96 } from '../utils/theme';
@@ -23,6 +24,14 @@ const ChatBot = () => {
 
 	useEffect(() => {
 		loadChatLog();
+		scrollToBottom();
+
+		(async () => {
+			const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+			if (status !== 'granted') {
+				toast('사진 접근 권한이 필요합니다.');
+			}
+		})();
 	}, []);
 
 	useEffect(() => {
@@ -36,9 +45,6 @@ const ChatBot = () => {
 	};
 
 	const loadChatLog = async () => {
-		//TODO
-		setMessages([{id: 1, message: '안녕하세요! 무슨 일이 있으셨나요?', sender: 'bot', created_at: new Date()}, {id: 2, message: 'test', sender: 'bot', created_at: new Date()}])
-	
 		try {
 			const res = await axios.get(`http://34.64.120.166:8000/api/chat-messages/?user_id=${userId}`,
 			{},
@@ -47,7 +53,13 @@ const ChatBot = () => {
 					'Content-Type': 'application/x-www-form-urlencoded'
 				}
 			});
-			console.log(res.data)
+
+			setMessages(res.data.map((message, idx) => ({
+				id: idx,
+				message: message.message,
+				sender: message.sender,
+				created_at: new Date(message.created_at)
+			})))
 
 		} catch (error) {
 			toast('서버 접속이 원활하지 않습니다.');
@@ -58,22 +70,24 @@ const ChatBot = () => {
 
 	const onEventStart = async () => {
 		try {
-			// const res = await axios.post('http://34.64.120.166:8000/api/chat-messages/', {  
-			// 	user_id: userId,
-			// 	message: null,
-			// 	start: 1
-			// }, {  
-			// 	headers: {
-			// 		'Content-Type': 'application/x-www-form-urlencoded'
-			// 	}
-			// });
+			const res = await axios.post('http://34.64.120.166:8000/api/chat-messages/', {  
+				user_id: userId,
+				message: null,
+				start: 1
+			}, {  
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				}
+			});
 
-			// res_message = {
-			// 	id: Date.now(),
-			// 	message: res.data.message,
-			// 	sender: 'bot',
-			// 	created_at: res.data.created_at
-			// };
+			const res_message = {
+				id: Date.now(),
+				message: res.data.message,
+				sender: 'bot',
+				created_at: new Date(res.data.created_at)
+			};
+
+			setMessages((prevMessages) => [...prevMessages, res_message]);
 			setImageUrls([]);
 			setIsChatting(true);
 
@@ -85,7 +99,17 @@ const ChatBot = () => {
 
 	const onEventEnd = async () => {
 		try {
-			// api 호출
+			const res = await axios.post('http://34.64.120.166:8000/api/chat-messages/', {  
+				user_id: userId,
+				message: null,
+				end: true
+			}, {  
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				}
+			});
+
+			scrollToBottom();
 			setInputText('');
 			setIsChatting(false);
 
@@ -117,8 +141,8 @@ const ChatBot = () => {
 					'Content-Type': 'application/x-www-form-urlencoded'
 				}
 			});
-			
-			res_message = {
+
+			const res_message = {
 				id: Date.now(),
 				message: res.data.message,
 				sender: 'bot',
@@ -135,7 +159,32 @@ const ChatBot = () => {
 
 	const handleImage = async () => {
 		try {
-			setImageUrls(['dummy']); // TODO 받아온 url
+			let result = await ImagePicker.launchImageLibraryAsync({
+				mediaTypes: ImagePicker.MediaTypeOptions.Images,
+				allowsMultipleSelection: true,
+				base64: true,
+				quality: 1,
+			});
+
+			if (!result.canceled) {
+				if (result.assets.length > 5) {
+					toast('사진은 5장까지 업로드 가능합니다.');
+					return;
+				}
+
+				const images = result.assets.map(r => r.base64);
+
+				const res = await axios.post('http://34.64.120.166:8000/api/image/', {
+					images: JSON.stringify(images),
+					user_id: userId
+				}, {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				})
+				
+				setImageUrls(res.data.urls);
+			}
 
 		} catch (error) {
 			toast('서버 접속이 원활하지 않습니다.');
@@ -154,7 +203,7 @@ const ChatBot = () => {
 							<EventSeparator>
 								<EventSeparatorText>
 									{message.created_at.getFullYear()}년{' '}
-									{message.created_at.getMonth()}월{' '}
+									{message.created_at.getMonth() + 1}월{' '}
 									{message.created_at.getDate()}일{' '}
 									{message.created_at.getHours()}시{' '}
 									{message.created_at.getMinutes()}분
@@ -177,7 +226,7 @@ const ChatBot = () => {
 							{(isChatting && message.sender === 'bot' && idx === messages.length - 1) && (
 								<EndButtonContainer>
 									<EndButton onPress={onEventEnd}>
-										<EndButtonText>이 주제의 대화 끝내기</EndButtonText>
+										<EndButtonText>이 주제의{'\n'}대화 끝내기</EndButtonText>
 									</EndButton>
 								</EndButtonContainer>
 							)}
@@ -203,10 +252,17 @@ const ChatBot = () => {
 											</WideButton>
 										</>
 									) : (
-										<NoticeText>
-											일기에 사진이 추가되었습니다.{'\n'}
-											새로운 대화를 시작해보세요!
-										</NoticeText>
+										<>
+											<ImagesContainer>
+												{imageUrls.map(url => (
+													<UploadedImage source={{ uri: url }} key={url} />
+												))}
+											</ImagesContainer>
+											<NoticeText>
+												일기에 사진이 추가되었습니다.{'\n'}
+												새로운 대화를 시작해보세요!
+											</NoticeText>
+										</>
 									)}
 							</>
 						) : (
@@ -226,6 +282,7 @@ const ChatBot = () => {
 							value={inputText}
 							multiline={true}
 							onChangeText={setInputText}
+							onFocus={scrollToBottom}
 						/>
 						<SendButton onPress={handleSend}>
 							<Icon source={require('../assets/send-icon.png')} />
@@ -250,7 +307,7 @@ const EventSeparator = styled.View`
 	flex: 1;
 	flex-direction: row;
 	justify-content: center;
-	margin-bottom: ${w28}px;
+	margin: ${w28}px 0;
 `
 
 const EventSeparatorText = styled.Text`
@@ -300,6 +357,7 @@ const MessageText = styled.Text`
 
 const BottomContainer = styled.View`
 	align-items: center;
+	background-color: ${({ theme }) => theme.background};
 `;
 
 const NoticeContainer = styled.View`
@@ -313,6 +371,21 @@ const NoticeText = styled.Text`
 	text-align: center;
 	font-size: 17px;
 	font-family: Regular;
+`;
+
+const ImagesContainer = styled.View`
+	flex-direction: row;
+	justify-content: center;
+	background-color: ${({ theme }) => theme.secondaryBackground}80;
+	margin-top: ${w32}px;
+	padding: ${w16}px;
+`;
+
+const UploadedImage = styled.Image`
+	width: ${w96 * 2}px;
+	height: ${w96 * 2}px;
+	margin: ${w16}px;
+	border-radius: ${w16}px;
 `;
 
 const WideButton = styled.TouchableOpacity`
@@ -342,6 +415,7 @@ const EndButton = styled.TouchableOpacity`
 `;
 
 const EndButtonText = styled.Text`
+	text-align: center;
 	font-size: 10px;
 	color: ${({ theme }) => theme.background};
 	font-family: Light;

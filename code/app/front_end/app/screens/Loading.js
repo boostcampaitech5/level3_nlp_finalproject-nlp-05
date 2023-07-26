@@ -1,9 +1,11 @@
 import { useEffect, useContext } from 'react';
 import * as Font from 'expo-font';
-import { Context } from '../utils/Context';
 import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
+import * as Application from 'expo-application';
 import { toast } from '../utils/toast';
 import * as SplashScreen from 'expo-splash-screen';
+import { Context } from '../utils/Context';
 
 const Loading = () => {
 	const { setIsLogin, setUserId, setFirstVisit } = useContext(Context);
@@ -20,18 +22,27 @@ const Loading = () => {
 				});
 
 				// login or signup
-				const savedUserId = await SecureStore.getItemAsync('userId');
+				const savedUserId = await SecureStore.getItemAsync('id');
 				
 				if (savedUserId) {
 					setUserId(savedUserId);
-					// TODO 임시로 넣은 ID, 추후 삭제
-					setUserId('test_id')
+					
+					// setUserId('test_id') // TODO 임시로 넣은 ID, 추후 삭제
 					
 				} else {
-					// API로 불러오기
-					const newUserId = '12345';
+					const newUserId = Application.androidId;
+					// const newUserId = 'test_id'; // TODO 임시로 넣은 ID
 					setFirstVisit(true);
-					await SecureStore.setItemAsync('userId', newUserId);
+					await SecureStore.setItemAsync('id', newUserId);
+					
+					const res = await axios.post('http://34.64.120.166:8000/api/profile/', {
+						user_id: newUserId
+					}, {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					})
+
 					setUserId(newUserId);
 				}
 

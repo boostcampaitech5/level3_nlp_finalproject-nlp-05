@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ScrollView } from 'react-native';
+import { View, Image, ScrollView } from 'react-native';
 import styled, { useTheme } from 'styled-components/native';
 import CalendarPicker from 'react-native-calendar-picker';
+import Carousel from 'react-native-snap-carousel';
 import axios from 'axios';
 import { SCREEN_WIDTH, w8, w14, w16, w28, w32, w48, w64, w84, w96, w108, w144 } from '../utils/theme';
 import Container from '../components/Container';
@@ -72,14 +73,18 @@ const CalendarModal = ({ visible, onSelectCalendar, onClose, yesterday, selected
 	);
 };
 
+const imageWidth = SCREEN_WIDTH - 80; // 40: Space on both sides to show parts of previous/next images
+const imageHeight = SCREEN_WIDTH - 80;
 const dummyfeed = [
 	[
 		{
 			time: '06:31',
+			images: [require('../images/test11.jpg'), require('../images/test43.jpg'), require('../images/test169.jpg')],
 			text: '이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n'
 		},
 		{
 			time: '06:32',
+			images: [],
 			text: '이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n'
 		}
 	],
@@ -130,6 +135,15 @@ const Feed = () => {
 			datesScrollRef.current.scrollTo({ x: selectedX - 6 * (w108 + w28) - w64, y: 0, animated: true });
 		}
 	}, [selectedDate]);
+
+	const renderImageItem = ({ item }) => (
+		<View style={{ alignItems: 'center' }}>
+			<Image
+				source={item}
+				style={{ width: SCREEN_WIDTH * 0.8, height: SCREEN_WIDTH * 0.8, borderRadius: 10 }}
+			/>
+		</View>
+	);
 
 	const datesScrollToRight = () => {
 		if (datesScrollRef.current) {
@@ -229,6 +243,14 @@ const Feed = () => {
 			{feeds && feeds.map((feed, idx) => (
 				<FeedContainer key={idx}>
 					<FeedTime>{feed.time}</FeedTime>
+					<Carousel
+						data={feed.images}
+						renderItem={renderImageItem}
+						sliderWidth={SCREEN_WIDTH}
+						itemWidth={SCREEN_WIDTH * 0.8}
+						windowSize={5}
+						inactiveSlideScale={0.9}
+					/>
 					<FeedText
 						selectable
 						selectionColor={theme.secondaryBackground}>
