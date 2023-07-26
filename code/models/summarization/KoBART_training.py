@@ -7,6 +7,13 @@ import random
 import numpy as np
 
 def train():
+    seed = 418
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    
     tokenizer = PreTrainedTokenizerFast.from_pretrained('gogamza/kobart-summarization')
     add_special_tokens = {'additional_special_tokens' : ["[USER]", "[SYSTEM]"]}
         
