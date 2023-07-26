@@ -1,4 +1,4 @@
-import torch
+import torch, wandb
 from transformers import BartForConditionalGeneration, Trainer, TrainingArguments, PreTrainedTokenizerFast, AutoTokenizer
 import pandas as pd
 from load_data import KoBART_data_load, KoBART_Dataset
@@ -34,12 +34,15 @@ def train():
 
     compute_metrics_use = compute_metrics(tokenizer)
 
+    wandb.init(project="kobart")
+    wandb.run.name = 'kobart, epoch=15'
+    
     training_args = TrainingArguments(
         learning_rate=7e-6,
         save_strategy="steps",
         evaluation_strategy="steps",
-        metric_for_best_model="rouge-1",
-        num_train_epochs=20,
+        metric_for_best_model="loss",
+        num_train_epochs=15,
         per_device_train_batch_size=32,
         per_device_eval_batch_size=32,
         output_dir="/opt/ml/code/models/summarization/kobart_output",
