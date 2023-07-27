@@ -1,15 +1,17 @@
 import { useEffect, useContext } from 'react';
-import * as Font from 'expo-font';
-import { Context } from '../utils/Context';
+import * as Application from 'expo-application';
 import * as SecureStore from 'expo-secure-store';
-import { toast } from '../utils/toast';
 import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
+import axios from 'axios';
+import { Context } from '../utils/Context';
+import { toast } from '../utils/toast';
 
 const Loading = () => {
-	const { setIsLogin, setUserId, setFirstVisit } = useContext(Context);
+	const { setIsLogin, setUserId, setIsChatting } = useContext(Context);
 
 	useEffect(() => {
-		const loading = async () => {
+		(async () => {
 			try {
 				// load font
 				await Font.loadAsync({
@@ -18,23 +20,31 @@ const Loading = () => {
 					'Bold': require('../assets/fonts/NanumSquareNeo-cBd.ttf'),
 					'HandWriting': require('../assets/fonts/nanum_handwriting.ttf')
 				});
-
-				// login or signup
-				const savedUserId = await SecureStore.getItemAsync('userId');
+				
+				const savedUserId = await SecureStore.getItemAsync('id');
 				
 				if (savedUserId) {
+					// login
 					setUserId(savedUserId);
-					// TODO 임시로 넣은 ID, 추후 삭제
-					setUserId('test_id')
 					
 				} else {
-					// API로 불러오기
-					const newUserId = '12345';
-					setFirstVisit(true);
-					await SecureStore.setItemAsync('userId', newUserId);
+					// signup
+					const newUserId = Application.androidId;
+					await SecureStore.setItemAsync('id', newUserId);
+					
+					await axios.post('http://34.64.120.166:8000/api/profile/', {
+						user_id: newUserId
+					}, {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					});
+
 					setUserId(newUserId);
 				}
 
+				const isChatting = await SecureStore.getItemAsync('isChatting');
+				setIsChatting(isChatting === 'true');
 				setIsLogin(true);
 
 				// hide splash screen
@@ -44,9 +54,8 @@ const Loading = () => {
 				toast('로그인에 실패했습니다.');
 				console.log(error);
 			}
-		};
-		
-		loading();
+		})();
+
 	}, []);
 
 	return null;

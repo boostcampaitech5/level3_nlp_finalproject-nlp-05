@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "fine",
+    "name": "Fine",
     "slug": "fine",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,10 +21,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.olaoot.fine"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9f4a1932-d5c3-46a1-8966-f9593c6aafb7"
+      }
     }
   }
 }

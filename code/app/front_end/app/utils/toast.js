@@ -11,4 +11,4 @@ export const toast = (str) => {
             paddingHorizontal: 16
         }
     });
-}
+};

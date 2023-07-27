@@ -14,7 +14,7 @@ export const getTheme = () => {
 		secondary: '#3FA3F4',
 		primaryBackground: '#C2E59C',
 		secondaryBackground: '#64B3F4',
-		background: '#F9FFF3'
+		background: '#F9FFFD'
 	}
   
 	const eveningTheme = {

@@ -18,8 +18,7 @@ const Main = () => {
 				<Stack.Screen name='Root' component={TabNavigator} options={{headerShown: false}} />
 			</Stack.Navigator>
 		</NavigationContainer>
-	)
-}
-	
+	);
+};
 
 export default Main;
