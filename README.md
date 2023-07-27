@@ -43,21 +43,22 @@
 
 ### Diary Generation
 ![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/ae79c6ff-489f-4b33-973b-8b12f5fac301)
-
++ ***model: gogamza/kobart-summarization***
+  
 <br>
 
 ### Generation Style Change Model
 ![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/5317da6f-f318-4e07-bb3e-378dd8b2c3ad)
-
++ ***model: NHNDQ/bart-speech-style-converter***
+  
 <br>
 
 ------
 
 <br>
 
-  ### System Architecture
-  ![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/7b98f242-ed4a-444a-93fb-af4cf1b96f32)
-  + ***model: NHNDQ/bart-speech-style-converter***
+### System Architecture
+![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/7b98f242-ed4a-444a-93fb-af4cf1b96f32)  
   
 <br>
 
