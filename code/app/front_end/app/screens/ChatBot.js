@@ -3,12 +3,13 @@ import { TextInput } from 'react-native';
 import styled, { useTheme } from 'styled-components/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
+import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
-import { Context } from '../utils/Context';
-import { w8, w16, w24, w28, w32, w48, w64, w96 } from '../utils/theme';
 import Container from '../components/Container';
 import Header from '../components/Header';
 import Icon from '../components/Icon';
+import { Context } from '../utils/Context';
+import { w8, w16, w24, w28, w32, w48, w64, w96 } from '../utils/theme';
 import { toast } from '../utils/toast';
 
 const FIRSTCHAT = '안녕하세요! 무슨 일이 있으셨나요?';
@@ -16,10 +17,9 @@ const FIRSTCHAT = '안녕하세요! 무슨 일이 있으셨나요?';
 const ChatBot = () => {
 	const [messages, setMessages] = useState([]);
 	const [inputText, setInputText] = useState('');
-	const [isChatting, setIsChatting] = useState(false);
 	const [imageUrls, setImageUrls] = useState([]);
 	const scrollViewRef = useRef(null);
-	const { userId } = useContext(Context);
+	const { userId, isChatting, setIsChatting } = useContext(Context);
 	const theme = useTheme();
 
 	useEffect(() => {
@@ -47,26 +47,26 @@ const ChatBot = () => {
 	const loadChatLog = async () => {
 		try {
 			const res = await axios.get(`http://34.64.120.166:8000/api/chat-messages/?user_id=${userId}`,
-			{},
-			{
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded'
-				}
-			});
+				{},
+				{
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				});
 
 			setMessages(res.data.map((message, idx) => ({
 				id: idx,
 				message: message.message,
 				sender: message.sender,
 				created_at: new Date(message.created_at)
-			})))
+			})));
 
 		} catch (error) {
 			toast('서버 접속이 원활하지 않습니다.');
 			console.log(error);
 		}
 
-	}
+	};
 
 	const onEventStart = async () => {
 		try {
@@ -90,20 +90,21 @@ const ChatBot = () => {
 			setMessages((prevMessages) => [...prevMessages, res_message]);
 			setImageUrls([]);
 			setIsChatting(true);
+			await SecureStore.setItemAsync('isChatting', 'true');
 
 		} catch (error) {
 			toast('서버 접속이 원활하지 않습니다.');
 			console.log(error);
 		}
-	}
+	};
 
 	const onEventEnd = async () => {
 		try {
-			const res = await axios.post('http://34.64.120.166:8000/api/chat-messages/', {  
+			await axios.post('http://34.64.120.166:8000/api/chat-messages/', {  
 				user_id: userId,
 				message: null,
 				end: true
-			}, {  
+			}, {
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded'
 				}
@@ -112,12 +113,13 @@ const ChatBot = () => {
 			scrollToBottom();
 			setInputText('');
 			setIsChatting(false);
+			await SecureStore.setItemAsync('isChatting', 'false');
 
 		} catch (error) {
 			toast('서버 접속이 원활하지 않습니다.');
 			console.log(error);
 		}
-	}
+	};
 
 	const handleSend = async () => {
 		if (!inputText)
@@ -238,32 +240,31 @@ const ChatBot = () => {
 			<BottomContainer>
 				{!isChatting ? (
 					<NoticeContainer>
-						{messages ? (
+						{messages.length !== 0 ? (
 							<>
-								{!imageUrls.length ? (
-										<>
-											{/* TODO 이미지 컨테이너 */}
-											<NoticeText>
-												대화가 종료되었습니다.{'\n'}
-												이 시간을 추억할 만한 사진이 있나요?
-											</NoticeText>
-											<WideButton onPress={handleImage}>
-												<WideButtonText>기록에 사진 추가하기</WideButtonText>
-											</WideButton>
-										</>
-									) : (
-										<>
-											<ImagesContainer>
-												{imageUrls.map(url => (
-													<UploadedImage source={{ uri: url }} key={url} />
-												))}
-											</ImagesContainer>
-											<NoticeText>
-												일기에 사진이 추가되었습니다.{'\n'}
-												새로운 대화를 시작해보세요!
-											</NoticeText>
-										</>
-									)}
+								{imageUrls.length === 0 ? (
+									<>
+										<NoticeText>
+											대화가 종료되었습니다.{'\n'}
+											이 시간을 추억할 만한 사진이 있나요?
+										</NoticeText>
+										<WideButton onPress={handleImage}>
+											<WideButtonText>기록에 사진 추가하기</WideButtonText>
+										</WideButton>
+									</>
+								) : (
+									<>
+										<ImagesContainer>
+											{imageUrls.map(url => (
+												<UploadedImage source={{ uri: url }} key={url} />
+											))}
+										</ImagesContainer>
+										<NoticeText>
+											일기에 사진이 추가되었습니다.{'\n'}
+											새로운 대화를 시작해보세요!
+										</NoticeText>
+									</>
+								)}
 							</>
 						) : (
 							<NoticeText>
@@ -301,14 +302,14 @@ const MessagesContainer = styled.ScrollView`
 
 const MessageContainer = styled.View`
 	flex: 1;
-`
+`;
 
 const EventSeparator = styled.View`
 	flex: 1;
 	flex-direction: row;
 	justify-content: center;
 	margin: ${w28}px 0;
-`
+`;
 
 const EventSeparatorText = styled.Text`
 	padding: ${w8}px ${w64}px;
@@ -317,7 +318,7 @@ const EventSeparatorText = styled.Text`
 	color: ${({ theme }) => theme.background};
 	font-family: Light;
 	font-size: ${w32}px;
-`
+`;
 
 const MessageContent = styled.View`
 	flex: 1;

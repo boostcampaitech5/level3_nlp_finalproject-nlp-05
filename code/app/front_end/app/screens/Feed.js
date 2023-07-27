@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Image, ScrollView } from 'react-native';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import { ScrollView } from 'react-native';
 import styled, { useTheme } from 'styled-components/native';
 import CalendarPicker from 'react-native-calendar-picker';
-import Carousel from 'react-native-snap-carousel';
 import axios from 'axios';
-import { SCREEN_WIDTH, w8, w14, w16, w28, w32, w48, w64, w84, w96, w108, w144 } from '../utils/theme';
 import Container from '../components/Container';
 import Header from '../components/Header';
 import Icon from '../components/Icon';
+import { Context } from '../utils/Context';
+import { SCREEN_WIDTH, w8, w14, w16, w28, w32, w48, w64, w84, w96, w108, w144 } from '../utils/theme';
 import { toast } from '../utils/toast';
 
 const getLastDates = yesterday => {
@@ -73,33 +73,6 @@ const CalendarModal = ({ visible, onSelectCalendar, onClose, yesterday, selected
 	);
 };
 
-const imageWidth = SCREEN_WIDTH - 80; // 40: Space on both sides to show parts of previous/next images
-const imageHeight = SCREEN_WIDTH - 80;
-const dummyfeed = [
-	[
-		{
-			time: '06:31',
-			images: [require('../images/test11.jpg'), require('../images/test43.jpg'), require('../images/test169.jpg')],
-			text: '이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n'
-		},
-		{
-			time: '06:32',
-			images: [],
-			text: '이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n이것은 테스트 일기 내용입니다. 일기 생성은 아직 APP과 연동되지 않았습니다. 최종 제출 전까지 완성할 계획입니다.\n'
-		}
-	],
-	[
-		{
-			time: '12:34',
-			text: '오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다. 오늘은 17일이다.'
-		},
-		{
-			time: '11:32',
-			text: '배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. 배고프다. '
-		}
-	]
-];
-
 const Feed = () => {
 	const [yesterday, setYesterday] = useState(() => {
 		const yesterday = new Date();
@@ -112,13 +85,15 @@ const Feed = () => {
 	const [calendarVisible, setCalendarVisible] = useState(false);
 	const [datesScrollOffset, setDatesScrollOffset] = useState(0);
 
+	const { userId } = useContext(Context);
+
 	const datesScrollRef = useRef(null);
 	const theme = useTheme();
 
 	useEffect(() => {
 		datesScrollToRight();
 		// selectedDate에 해당하는 feeds 받아오기
-		setFeeds(dummyfeed[0]);
+		loadFeeds(yesterday);
 	}, []);
 
 	useEffect(() => {
@@ -136,30 +111,37 @@ const Feed = () => {
 		}
 	}, [selectedDate]);
 
-	const renderImageItem = ({ item }) => (
-		<View style={{ alignItems: 'center' }}>
-			<Image
-				source={item}
-				style={{ width: SCREEN_WIDTH * 0.8, height: SCREEN_WIDTH * 0.8, borderRadius: 10 }}
-			/>
-		</View>
-	);
-
 	const datesScrollToRight = () => {
 		if (datesScrollRef.current) {
 			datesScrollRef.current.scrollToEnd();
 		}
 	};
 
-	const loadFeeds = date => {
-		// date에 해당하는 feeds 받아오기
+	const loadFeeds = async (date) => {
+		const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
 		try {
-			setFeeds(dummyfeed[1]);
+			const res = await axios.post('http://34.64.120.166:8000/api/sum-message/', {
+				user_id: userId,
+				date: dateStr
+			}, {
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				}
+			})
+			
+			const resFeeds = res.data.map(feed => ({
+				time: `${String(new Date(feed.start_time).getHours()).padStart(2, '0')}:${String(new Date(feed.start_time).getMinutes()).padStart(2, '0')}`,
+				imageUrls: feed.image_link,
+				text: feed.stylechangemessage
+			}))
+			setFeeds(resFeeds);
+
 		} catch (error) {
-			toast('서버 접속이 원활하지 않습니다.');
+			toast('일기를 불러오지 못했습니다.');
 			console.log(error);
 		}
-	}
+	};
 
 	const onSelectDate = date => {
 		setSelectedDate(date);
@@ -192,74 +174,78 @@ const Feed = () => {
 	};
 
 	return (
-	<Container>
-		<Header view='feed' />
+		<Container>
+			<Header view='feed' />
 
-		<DatesScrollContainer>
-			<DatesScroll
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				ref={datesScrollRef}
-				onScroll={e => setDatesScrollOffset(e.nativeEvent.contentOffset.x)}
-			>
-				{dates.map((date, idx) => (
-					<DateContainer
-						key={idx}
-						date={date}
-						selectedDate={selectedDate}
-						onPress={() => onSelectDate(date, idx)}
-					>
-						<DayText date={date} selectedDate={selectedDate}>
-							{dayToKorean(date)}
-						</DayText>
-						<DateText date={date} selectedDate={selectedDate}>
-							{date.getDate()}
-						</DateText>
-					</DateContainer>
-				))}
-			</DatesScroll>
-		</DatesScrollContainer>
+			<DatesScrollContainer>
+				<DatesScroll
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					ref={datesScrollRef}
+					onScroll={e => setDatesScrollOffset(e.nativeEvent.contentOffset.x)}
+				>
+					{dates.map((date, idx) => (
+						<DateContainer
+							key={idx}
+							date={date}
+							selectedDate={selectedDate}
+							onPress={() => onSelectDate(date, idx)}
+						>
+							<DayText date={date} selectedDate={selectedDate}>
+								{dayToKorean(date)}
+							</DayText>
+							<DateText date={date} selectedDate={selectedDate}>
+								{date.getDate()}
+							</DateText>
+						</DateContainer>
+					))}
+				</DatesScroll>
+			</DatesScrollContainer>
 
-		<SelectedDateContainer>
-			<SelectedDate onPress={() => setCalendarVisible(true)}>
-				<SelectedDateText>
-					{selectedDate.getFullYear()}. {selectedDate.getMonth() + 1}. {selectedDate.getDate()}. ▾
-				</SelectedDateText>
-			</SelectedDate>
-			<YesterdayButton onPress={onGotoYesterday}>
-				<Icon source={require('../assets/today-icon.png')} />
-			</YesterdayButton>
-		</SelectedDateContainer>
+			<SelectedDateContainer>
+				<SelectedDate onPress={() => setCalendarVisible(true)}>
+					<SelectedDateText>
+						{selectedDate.getFullYear()}. {selectedDate.getMonth() + 1}. {selectedDate.getDate()}. ▾
+					</SelectedDateText>
+				</SelectedDate>
+				<YesterdayButton onPress={onGotoYesterday}>
+					<Icon source={require('../assets/today-icon.png')} />
+				</YesterdayButton>
+			</SelectedDateContainer>
 
-		<CalendarModal
-			visible={calendarVisible}
-			onSelectCalendar={onSelectCalendar}
-			onClose={() => setCalendarVisible(false)}
-			yesterday={yesterday}
-			selectedDate={selectedDate}
-		/>
+			<CalendarModal
+				visible={calendarVisible}
+				onSelectCalendar={onSelectCalendar}
+				onClose={() => setCalendarVisible(false)}
+				yesterday={yesterday}
+				selectedDate={selectedDate}
+			/>
 
-		<FeedsScroll>
-			{feeds && feeds.map((feed, idx) => (
-				<FeedContainer key={idx}>
-					<FeedTime>{feed.time}</FeedTime>
-					<Carousel
-						data={feed.images}
-						renderItem={renderImageItem}
-						sliderWidth={SCREEN_WIDTH}
-						itemWidth={SCREEN_WIDTH * 0.8}
-						windowSize={5}
-						inactiveSlideScale={0.9}
-					/>
-					<FeedText
-						selectable
-						selectionColor={theme.secondaryBackground}>
+			<FeedsScroll>
+				{feeds.length !== 0 ? (feeds.map((feed, idx) => (
+					<FeedContainer key={idx}>
+						<FeedTime>{feed.time}</FeedTime>
+						{feed.imageUrls.length !== 0 && (
+							<Carousel>
+								{feed.imageUrls.map((uri, idx) => (
+									<CarouselImageContainer key={idx}>
+										<CarouselPaging>{idx + 1}/{feed.imageUrls.length}</CarouselPaging>
+										<CarouselImage source={{ uri }} resizeMode="cover" />
+									</CarouselImageContainer>
+								))}
+							</Carousel>
+						)}
+						<FeedText
+							selectable
+							selectionColor={theme.secondaryBackground}>
 							{feed.text}
-					</FeedText>
-				</FeedContainer>
-			))}
-		</FeedsScroll>
-	</Container>
+						</FeedText>
+					</FeedContainer>
+				))) : (
+					<NoticeText>이 날짜에 저장된 일기가 없습니다.</NoticeText>
+				)}
+			</FeedsScroll>
+		</Container>
 	);
 };
 
@@ -320,8 +306,7 @@ const SelectedDateContainer = styled.View`
 	border-bottom-color: ${({ theme }) => theme.gray};
 `;
 
-const SelectedDate = styled.TouchableOpacity`
-`;
+const SelectedDate = styled.TouchableOpacity``;
 
 const SelectedDateText = styled.Text`
 	font-size: ${w96}px;
@@ -356,12 +341,43 @@ const CalendarContainer = styled.View`
 
 const FeedsScroll = styled.ScrollView`
 	flex: 1;
-	padding-top: ${w32}px;
+	padding: ${w32}px 0;
 `;
 
 const FeedContainer = styled.View`
 	flex: 1;
 	padding: ${w32}px 0;
+`;
+
+const Carousel = styled(ScrollView).attrs(() => ({
+	horizontal: true,
+	pagingEnabled: true,
+	showsHorizontalScrollIndicator: false
+}))`
+	margin-top: ${w28}px;
+`;
+
+const CarouselImageContainer = styled.View`
+	align-items: center;
+	width: ${SCREEN_WIDTH}px;
+	height: ${SCREEN_WIDTH}px;
+`;
+
+const CarouselImage = styled.Image`
+	width: ${SCREEN_WIDTH}px;
+	height: ${SCREEN_WIDTH}px;
+`;
+
+const CarouselPaging = styled.Text`
+	padding: ${w28}px ${w32}px;
+	color: ${({ theme }) => theme.background};
+	background-color: ${({ theme }) => theme.secondaryBackground}80;
+	font-family: Light;
+	border-radius: 100px;
+	position: absolute;
+	z-index: 1;
+	top: ${w32}px;
+	right: ${w32}px;
 `;
 
 const FeedTime = styled.Text`
@@ -372,9 +388,17 @@ const FeedTime = styled.Text`
 `;
 
 const FeedText = styled.Text`
+	margin: ${w28}px 0 ${w64}px;
 	padding: 0 ${w96}px;
 	font-size: ${w64}px;
 	font-family: HandWriting;
+`;
+
+const NoticeText = styled.Text`
+	margin: ${w96}px;
+	text-align: center;
+	font-size: 17px;
+	font-family: Regular;
 `;
 
 export default Feed;
