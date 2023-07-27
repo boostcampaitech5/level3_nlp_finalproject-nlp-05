@@ -3,7 +3,8 @@
 set -e
 
 apt-get update
-apt-get install -y python3-dev python3-venv sqlite3 supervisor nginx git systemd
+pip install --upgrade pip
+apt-get install -y python3-dev python3-venv sqlite3 supervisor nginx git systemd virtualenv
 apt-get install build-essential python3
 
 PROJECT_GIT_URL='https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05.git'
@@ -12,12 +13,12 @@ PROJECT_BASE_PATH='/code/server'
 mkdir -p $PROJECT_BASE_PATH
 git clone $PROJECT_GIT_URL $PROJECT_BASE_PATH
 
-mkdir -p $PROJECT_BASE_PATH/code/app/back_end/env
-python3 -m venv $PROJECT_BASE_PATH/code/app/back_end/env
-
 cd server
 git remote set-url origin https://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@github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05.git
-git pull origin feat/back_end_init
+git pull origin feat/back_end_api
+
+cd $PROJECT_BASE_PATH/code/app/back_end
+virtualenv env --python=python3.8
 
 $PROJECT_BASE_PATH/code/app/back_end/env/bin/pip install -r /code/requirement.txt uwsgi==2.0.21
 

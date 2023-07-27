@@ -52,6 +52,7 @@ explanation/
 dockerfile:Zone.Identifier
 final_project_keypair.pem
 final_project_keypair.pem:Zone.Identifier
+db.sqlite3
 
 mecab-0.996-ko-0.9.2.tar.gz
 mecab-0.996-ko-0.9.2

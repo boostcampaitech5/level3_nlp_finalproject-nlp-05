@@ -1,16 +1,13 @@
 # Base image
-FROM ubuntu:20.04
-FROM python:3.9-slim
+FROM pytorch/pytorch
 
 # Set working directory
 WORKDIR /code
 
 # Update packages and install dependencies
-RUN apt-get update -y
-RUN pip install --upgrade pip
+RUN apt-get update && apt-get install -y init
 COPY requirement.txt /code/requirement.txt
 COPY setup.sh /code/setup.sh
-RUN pip3 install -r requirement.txt
 
 # Set python alias
 RUN touch /root/.bash_aliases
