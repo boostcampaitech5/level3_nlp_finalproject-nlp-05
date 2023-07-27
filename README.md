@@ -20,10 +20,7 @@
 
 <br>
 
----
-
-<br>
-
+## 🤖Model
 ### ChatBot
 ![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/a5e0c152-d0ae-4adc-b74f-26b769be3ea6)
 
@@ -56,24 +53,7 @@
   
 <br>
 
-------
-
-<br>
-
-### System Architecture
-![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/7b98f242-ed4a-444a-93fb-af4cf1b96f32)  
-  
-<br>
-
----
-
-<br>
-
-## ✔️Project
-
-### Structure
-> 여긴 마무리하면 채우죠
-
+## 🌐Web
 
 <br>
 
@@ -88,11 +68,15 @@
 
 <br>
 
----
+## 📐System Architecture
+### Structure
+> 여긴 마무리하면 채우죠
+
+![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/7b98f242-ed4a-444a-93fb-af4cf1b96f32)
 
 <br>
 
-### 향후 개선 방향
+## 🛠️향후 개선 방향
   #### Model
   + 챗봇 데이터 생성 방법이 단순해 데이터 다양성 Χ ➡ 생성 flow를 재구성해서 응답 유형을 다양화
   + KULLM 모델 사이즈로 인해 GPU 서버 사용 ➡ 유지 비용 비쌈 ➡ ***경량화*** 필요 
@@ -106,16 +90,13 @@
   + 챗봇 및 일기 말투 ***커스터마이징*** 기능
   + 음성 인식, 결제 내역, 지도 등 다양한 외부 API 연결
   + 기타 다양한 기능 추가 및 구독 시스템 등 수익 모델 기획을 통해 상업성 도모
-  
-<br>
-
----
 
 <br>
 
-💡 __*위에 관한 자세한 내용은 ```랩업리포트 링크```를 참고해주세요.*__
-
-<br>
-
-## Demo
+## 🧪Demo
 > 공사중
+
+<br>
+<br>
+
+> 💡 __*프로젝트에 관한 자세한 내용은 ```랩업리포트 링크```를 참고해주세요.*__
