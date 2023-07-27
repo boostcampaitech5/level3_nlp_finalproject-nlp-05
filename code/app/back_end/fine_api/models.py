@@ -4,62 +4,61 @@ from django.conf import settings
 from django.utils import timezone
 
 class UserProfileManager(BaseUserManager):
-    def create_user(self, email, password, name, **kwargs):
-        if not email:
-            raise ValueError('Users must have an email address')
+    def create_user(self, user_id, **kwargs):
         user = self.model(
-            email=email,
-            name=name
+            user_id=user_id
         )
-        user.set_password(password)
-        user.save(using=self._db)
 
+        user.save(using=self._db)
+        
         return user
 
-    def create_superuser(self, email=None, password=None, name=name, **extra_fields):
-        superuser = self.create_user(
-            email=email,
-            password=password,
-            name=name
-        )
-        
+    def create_superuser(self, user_id, password, **extra_fields):
+        validated_data = {'user_id': user_id}
+        superuser = UserProfile.objects.create(**validated_data)
+        superuser.set_password(password)
+
         superuser.is_staff = True
         superuser.is_superuser = True
         superuser.is_active = True
-        
-        superuser.save(using=self._db)
 
+        superuser.save(using=self._db)
+        
         return superuser
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
-    
-    email = models.EmailField(max_length=30, unique=True, null=False, blank=False)
-    name = models.CharField(max_length=10, default='')
+    user_id = models.CharField(max_length=100, unique=True)
+    generate_time = models.CharField(max_length=10, default="24")
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-    objects = UserProfileManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name']
+    USERNAME_FIELD = 'user_id'
+
+    objects = UserProfileManager()
 
 class ChatMessage(models.Model):
     message = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+                                on_delete=models.CASCADE)
+    sender = models.CharField(max_length=10, editable=False, default='user')
+    start_chat = models.CharField(max_length=10, default='0')
+    is_generated = models.BooleanField(default=False, editable=False)
 
-    def __str__(self):
-        return self.message
-
-class CombinedChat(models.Model):
-    combined_message = models.TextField()
-    created_at = models.DateTimeField(default=timezone.now)
+class SummarizedMessage(models.Model):
+    created_at = models.DateField(auto_now_add=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+                                on_delete=models.CASCADE)
+    stylechangemessage = models.CharField(max_length=1000, default='')
+    start_time = models.CharField(max_length=100, default='')
 
-    def __str__(self):
-        return self.combined_message
+class ImageModel(models.Model):
+    created_at = models.DateField(auto_now_add=True)
+    start_time = models.CharField(max_length=100, default='')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                on_delete=models.CASCADE)
+    image_link = models.CharField(max_length=5000, default='')
+
