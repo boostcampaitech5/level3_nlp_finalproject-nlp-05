@@ -27,7 +27,7 @@
   #### Dataset
   ![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/7a54362d-4213-4371-bb38-7598e52d9fd2)
   ![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/7579ff8f-301a-4343-a20a-6c3d3753acf5)
-  + gpt-3.5-turbo를 활용하여 직접 대화 데이터 생성
+  + ***gpt-3.5-turbo***를 활용하여 직접 대화 데이터 생성
   
 <br>
   
@@ -90,18 +90,9 @@
 
 ### 향후 개선 방향
   #### Model
-  + 챗봇 데이터 생성 방법이 단순해 데이터 다양성 Χ
-  + ➡ 생성 flow를 재구성해서 응답 유형을 다양화
-
-<br>
-
-  + KULLM 모델 사이즈로 인해 GPU 서버 사용 
-  + ➡ 유지 비용 비쌈 ➡ ***경량화*** 필요 
-
-<br>
-
-  + 일기 생성에 들어가는 모델 수가 많아 inference 시간 증가
-  + ➡ fine-tuning 으로 모델 수 줄이기
+  + 챗봇 데이터 생성 방법이 단순해 데이터 다양성 Χ ➡ 생성 flow를 재구성해서 응답 유형을 다양화
+  + KULLM 모델 사이즈로 인해 GPU 서버 사용 ➡ 유지 비용 비쌈 ➡ ***경량화*** 필요 
+  + 일기 생성에 들어가는 모델 수가 많아 inference 시간 증가 ➡ fine-tuning 으로 모델 수 줄이기
 
 <br>
 
