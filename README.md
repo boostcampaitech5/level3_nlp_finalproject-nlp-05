@@ -83,7 +83,7 @@
 <br>
 
 ### Generation Style Change Model
-![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/d21adcc3-5398-4cd6-9773-546ec281a87c)
+![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/f930733c-e0b2-47f6-b15f-3bb30c2b3857)
 + 한국어 문체 스타일 변환 ***"SmileStyle"*** 데이터셋으로 파인튜닝한 모델로 실험
 + 실험 결과 이미 그 자체로 ***input data의 훼손이 적고*** ***문체 스타일 변환도 잘 이루어지는 것***을 확인
 + ***model: NHNDQ/bart-speech-style-converter***
