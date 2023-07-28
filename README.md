@@ -44,7 +44,7 @@
 <br>
   
   #### Model Selection
-  ![image](https://git려 ➡ ***GPT API***를 사용하지 않는 방향으로 방안 모색
+  + ***Goal:*** ***Controllability***와 ***Monetary Cost*** 고려 ➡ ***GPT API***를 사용하지 않는 방향으로 방안 모색
   + ***model: gogamza/kobart-summarization***
   + ***metric: ROUGE-1, ROUGE-SU***
   
