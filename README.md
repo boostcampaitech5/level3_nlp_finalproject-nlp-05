@@ -39,15 +39,43 @@
   ![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/e58f137f-0a5a-408c-a292-1ce92d23f373)
   ![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/283ecebf-ffa4-4614-ab7d-330ae1b706cf)
   + ***gpt-3.5-turbo***를 활용하여 직접 대화 데이터 생성
-    
+  + ***Input Sentence:*** 최대 3 turn의 이전 대화 히스토리
+  + ***Label:*** Input sentence 다음으로 올 알맞은 system 응답 → ***train 1696개, test 340개***
+
 <br>
 <br>
   
   #### Model Selection
+  ![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/47ba8853-d7c1-412b-b632-c6896196b539)
+  + ***Goal:*** ***공감 능력을 갖춘 시스템의 적절한 리액션***과 ***자연스러운 질문***을 통한 오늘 하루의 정보 유도
+  + ***model: nlpai-lab/kullm-polyglot-5.8b-v2***
+  + ***metric:  ROUGE-1, ROUGE-SU, Similarity, Perplexity***
+  
+<br>
+
+---
+
+<br>
+
+### Summarization Model
+![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/c360b8d0-7a64-48e2-8119-584a0b16c85e)
+
+<br>
+
+  #### Data
+  ![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/33b76d2a-29e1-4008-8f1c-791318ecc548)
+  + ***ChatGPT***를 이용하여 대화 요약 데이터 직접 생성
+  + ***341개***
+
+<br>
+<br>
+
+  #### Model Selection
+  ![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/ca02f237-ece2-475a-bac1-f7e5708532c1)
   + ***Goal:*** ***Controllability***와 ***Monetary Cost*** 고려 ➡ ***GPT API***를 사용하지 않는 방향으로 방안 모색
   + ***model: gogamza/kobart-summarization***
   + ***metric: ROUGE-1, ROUGE-SU***
-  
+    
 <br>
 
 ---
