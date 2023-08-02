@@ -25,7 +25,7 @@
 ## 🤖Model
 
 ### PipeLine
-![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/60664644/c0c62f45-7b75-4aa9-b49a-de72197aae23)
+![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/60664644/e673b956-4da2-4cb9-9bd6-00065ff7353b)
 
 <br>
 
@@ -118,17 +118,17 @@
 ## 🌐 Product Serving
 ### Front-End
 - **React Native** 를 이용한 Cross-Platform App 개발
-![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/60664644/39200be3-e76f-41cc-baeb-0a7e1e8e11f5)
+![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/60664644/418327b6-838a-4b97-b58a-cb2026c9c054)
 
 <br>
 
 ### Back-End
-![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/a6c794b1-6bb1-4127-b85c-bd6b08010acb)
+![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/60664644/ada4f9ef-a16c-4f1c-933b-b80128a8de1e)
 
 <br>
 
 ## 📐System Architecture
-![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/102334596/7b98f242-ed4a-444a-93fb-af4cf1b96f32)
+![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/60664644/25a50f40-db50-4b89-9856-87065df2f8e7)
 
 <br>
 
