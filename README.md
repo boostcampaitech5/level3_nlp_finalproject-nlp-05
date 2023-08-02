@@ -160,4 +160,4 @@
 
 <br>
 
-> 💡 __*프로젝트에 관한 자세한 내용은 ```랩업리포트``` 및 [발표자료](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/blob/main/documents/%5B%EC%B5%9C%EC%A2%85%5DNLP_05_%ED%95%98%EB%A3%A8%20%EC%9A%94%EC%95%BD%20%ED%94%BC%EB%93%9C%20%EC%83%9D%EC%84%B1%20%EC%B1%97%EB%B4%87.pdf)를 참고해주세요.*__
+> 💡 __*프로젝트에 관한 자세한 내용은 [랩업리포트](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/blob/main/documents/%5B%EC%B5%9C%EC%A2%85%5DNLP_05_%ED%95%98%EB%A3%A8%20%EC%9A%94%EC%95%BD%20%ED%94%BC%EB%93%9C%20%EC%83%9D%EC%84%B1%20%EC%B1%97%EB%B4%87.pdf) 및 [발표자료](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/blob/main/documents/%5B%EC%B5%9C%EC%A2%85%5DNLP_05_%ED%95%98%EB%A3%A8%20%EC%9A%94%EC%95%BD%20%ED%94%BC%EB%93%9C%20%EC%83%9D%EC%84%B1%20%EC%B1%97%EB%B4%87.pdf)를 참고해주세요.*__
