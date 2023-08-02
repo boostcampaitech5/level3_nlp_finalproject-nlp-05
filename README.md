@@ -4,7 +4,7 @@
 
 ## 📎Fine. (diary-generation-using-chatbot)
 
-![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/60664644/4daab541-b37a-4301-b535-94aca71e5375)
+![image](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/assets/60664644/960ab096-1155-4600-9708-23a296273413)
 
 
 > 부스트캠프 AI-Tech 5기 NLP 트랙 Level3 Product serving 프로젝트입니다.
