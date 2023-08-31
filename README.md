@@ -14,6 +14,9 @@
 
 <br>
 
+> 💡 __*프로젝트에 관한 자세한 내용은 [랩업리포트](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/blob/main/documents/%5B%EC%B5%9C%EC%A2%85%5DNLP_05_%ED%95%98%EB%A3%A8%20%EC%9A%94%EC%95%BD%20%ED%94%BC%EB%93%9C%20%EC%83%9D%EC%84%B1%20%EC%B1%97%EB%B4%87.pdf), [발표영상](https://youtu.be/T2Agf95rmNI?si=cDpaRNj97EzL4W0c) 및 [발표자료](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/blob/main/documents/%5B%EC%B5%9C%EC%A2%85%5DNLP_05_%ED%95%98%EB%A3%A8%20%EC%9A%94%EC%95%BD%20%ED%94%BC%EB%93%9C%20%EC%83%9D%EC%84%B1%20%EC%B1%97%EB%B4%87.pdf)를 참고해주세요.*__
+<br>
+
 ## 🐴Members
 
 |<img src='https://avatars.githubusercontent.com/u/102334596?v=4' height=100 width=100px></img>|<img src='https://avatars.githubusercontent.com/u/86002769?v=4' height=100 width=100px></img>|<img src='https://avatars.githubusercontent.com/u/107304584?v=' height=100 width=100px></img>|<img src='https://avatars.githubusercontent.com/u/60664644?v=4' height=100 width=100px></img>|<img src='https://avatars.githubusercontent.com/u/126854237?v=4' height=100 width=100px></img>
@@ -157,7 +160,3 @@
 
 ## 🧪Demo
 - [youtube](https://youtu.be/5fr-eOwK-7k)
-
-<br>
-
-> 💡 __*프로젝트에 관한 자세한 내용은 [랩업리포트](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/blob/main/documents/%5B%EC%B5%9C%EC%A2%85%5DNLP_05_%ED%95%98%EB%A3%A8%20%EC%9A%94%EC%95%BD%20%ED%94%BC%EB%93%9C%20%EC%83%9D%EC%84%B1%20%EC%B1%97%EB%B4%87.pdf) 및 [발표자료](https://github.com/boostcampaitech5/level3_nlp_finalproject-nlp-05/blob/main/documents/%5B%EC%B5%9C%EC%A2%85%5DNLP_05_%ED%95%98%EB%A3%A8%20%EC%9A%94%EC%95%BD%20%ED%94%BC%EB%93%9C%20%EC%83%9D%EC%84%B1%20%EC%B1%97%EB%B4%87.pdf)를 참고해주세요.*__
